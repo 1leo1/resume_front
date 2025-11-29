@@ -9,7 +9,8 @@ export default function AuthSync() {
     useEffect(() => {
         if (session?.user) {
             // Sync user with backend
-            fetch("http://localhost:8000/auth/login", {
+            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+            fetch(`${backendUrl}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
