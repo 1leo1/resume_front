@@ -189,7 +189,7 @@ export default function OnboardingPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="text-4xl md:text-5xl font-bold mb-4"
+                  className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white"
                 >
                   Do you have an existing resume?
                 </motion.h1>
@@ -262,7 +262,7 @@ export default function OnboardingPage() {
                 </button>
 
                 <div className="text-center mb-12">
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                     What industry are you in?
                   </h1>
                   <p className="text-gray-600 dark:text-gray-400">
@@ -316,7 +316,7 @@ export default function OnboardingPage() {
                 </button>
 
                 <div className="text-center mb-12">
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                     What&apos;s your experience level?
                   </h1>
                   <p className="text-gray-600 dark:text-gray-400">
@@ -381,7 +381,7 @@ export default function OnboardingPage() {
                     <Sparkles className="w-4 h-4" />
                     Recommended for you
                   </span>
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                     Choose your template
                   </h1>
                   <p className="text-gray-600 dark:text-gray-400">
