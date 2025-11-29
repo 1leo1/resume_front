@@ -265,7 +265,7 @@ export default function OnboardingPage() {
                   <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                     What industry are you in?
                   </h1>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-base text-gray-700 dark:text-gray-300">
                     We&apos;ll recommend templates tailored to your field
                   </p>
                 </div>
