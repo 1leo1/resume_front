@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Replit proxy compatibility - allow all hosts
+  allowedDevOrigins: ['*'],
   async headers() {
     return [
       {
