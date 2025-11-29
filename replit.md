@@ -1,5 +1,13 @@
 # ResumeAI - AI-Powered Resume Builder
 
+## Quick Start
+```bash
+npm run dev
+```
+The app runs on http://0.0.0.0:5000
+
+---
+
 ## Overview
 ResumeAI is a modern, AI-powered resume builder application built with Next.js 16. It allows users to create professional, ATS-friendly resumes with guided workflows, industry-specific templates, and AI enhancement features.
 
@@ -92,7 +100,18 @@ This is a **frontend-only** application. The following API endpoints are referen
 
 When backend is ready, update the `NEXT_PUBLIC_BACKEND_URL` environment variable.
 
-## Recent Changes
+## Session Changes (November 29, 2025)
+
+### Bug Fixes
+- **Fixed text readability on landing page**: The hero heading "Build Your Perfect Resume in Minutes" was using gradient text with transparent fill, making it hard to read against the colored background. Changed to solid colors (dark gray/white for contrast) with blue highlight on "Perfect Resume".
+
+### UX Improvements
+- **Updated call-to-action routing**: All "Get Started Free" buttons now point to `/onboarding` instead of `/editor` and `/auth/signin`, ensuring users go through the guided onboarding flow first for a better personalized experience.
+
+### Deployment
+- **Configured production deployment**: Set up autoscale deployment with build and run commands for production readiness.
+
+## Recent Changes (Previous Sessions)
 - Initial setup with guided onboarding flow
 - Industry-specific template gallery
 - Resume editor with live preview
