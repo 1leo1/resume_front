@@ -198,7 +198,7 @@ export default function OnboardingPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-xl text-gray-600 dark:text-gray-400 mb-12"
+                  className="text-xl text-gray-700 dark:text-gray-300 mb-12"
                 >
                   We&apos;ll personalize your experience based on your answer
                 </motion.p>
@@ -217,7 +217,7 @@ export default function OnboardingPage() {
                       <Upload className="w-8 h-8 text-blue-600" />
                     </div>
                     <h3 className="text-xl font-bold mb-2">Yes, I have a resume</h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    <p className="text-gray-700 dark:text-gray-300 text-sm">
                       Upload your existing resume and we&apos;ll help you improve it with AI
                     </p>
                     <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -233,7 +233,7 @@ export default function OnboardingPage() {
                       <FileText className="w-8 h-8 text-cyan-600" />
                     </div>
                     <h3 className="text-xl font-bold mb-2">No, I&apos;m starting fresh</h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    <p className="text-gray-700 dark:text-gray-300 text-sm">
                       Create a new resume from scratch with our guided builder
                     </p>
                     <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -255,7 +255,7 @@ export default function OnboardingPage() {
               >
                 <button
                   onClick={goBack}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-8"
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white mb-8"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Back
@@ -309,7 +309,7 @@ export default function OnboardingPage() {
               >
                 <button
                   onClick={goBack}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-8"
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white mb-8"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Back
@@ -319,7 +319,7 @@ export default function OnboardingPage() {
                   <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                     What&apos;s your experience level?
                   </h1>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-700 dark:text-gray-300">
                     This helps us suggest the right layout and sections
                   </p>
                 </div>
@@ -347,7 +347,7 @@ export default function OnboardingPage() {
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold mb-1">{level.name}</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{level.description}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{level.description}</p>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-400">
                         <Clock className="w-4 h-4" />
@@ -370,7 +370,7 @@ export default function OnboardingPage() {
               >
                 <button
                   onClick={goBack}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mb-8"
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white mb-8"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Back
@@ -384,7 +384,7 @@ export default function OnboardingPage() {
                   <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                     Choose your template
                   </h1>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-700 dark:text-gray-300">
                     Based on your {industries.find(i => i.id === selectedIndustry)?.name} background and experience
                   </p>
                 </div>
@@ -439,7 +439,7 @@ export default function OnboardingPage() {
                     {hasResume ? "Continue to Upload" : "Start Building"}
                     <ArrowRight className="w-5 h-5" />
                   </button>
-                  <p className="mt-4 text-sm text-gray-500">
+                  <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
                     You can change your template anytime in the editor
                   </p>
                 </div>
