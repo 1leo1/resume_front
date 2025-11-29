@@ -48,7 +48,7 @@ export default function SignIn() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
                 <FileText className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
+              <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 ResumeAI
               </span>
             </Link>

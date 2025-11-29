@@ -112,9 +112,9 @@ export default function FeaturesPage() {
               <Sparkles className="w-4 h-4" />
               Powerful Features
             </span>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
               Everything You Need to{" "}
-              <span className="text-blue-600">Land Your Dream Job</span>
+              <span className="text-blue-600 dark:text-blue-400">Land Your Dream Job</span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Our comprehensive suite of tools helps you create professional resumes that get noticed by recruiters and pass ATS systems.
