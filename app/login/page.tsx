@@ -1,9 +1,9 @@
 'use client'
 
-import { login, signup, signInWithOAuth } from './actions'
+import { login, signup } from './actions'
 import { useActionState, useState } from 'react'
-import { Loader2, Mail, Lock, ArrowRight, Github, Linkedin, Chrome } from 'lucide-react'
-import Link from 'next/link'
+import { Loader2, Mail, Lock, ArrowRight, Github, Linkedin } from 'lucide-react'
+import { createClient } from '@/utils/supabase/client'
 
 export default function LoginPage() {
     const [stateLogin, formActionLogin] = useActionState(login, null)
@@ -17,6 +17,16 @@ export default function LoginPage() {
         setTimeout(() => setIsLoading(false), 2000)
     }
 
+    const handleSocialLogin = async (provider: 'github' | 'linkedin') => {
+        const supabase = createClient()
+        await supabase.auth.signInWithOAuth({
+            provider,
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+            },
+        })
+    }
+
     return (
         <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
             {/* Left Side - Branding & Testimonial */}
@@ -25,11 +35,8 @@ export default function LoginPage() {
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
 
                 <div className="relative z-10">
-                    <div className="flex items-center gap-2 text-2xl font-bold">
-                        <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center">
-                            C
-                        </div>
-                        ClayCV
+                    <div className="flex items-center gap-2">
+                        <img src="/logo.png" alt="ClayCV Logo" className="h-12 w-auto rounded-lg" />
                     </div>
                 </div>
 
@@ -68,7 +75,7 @@ export default function LoginPage() {
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 type="button"
-                                onClick={() => signInWithOAuth('github')}
+                                onClick={() => handleSocialLogin('github')}
                                 className="flex items-center justify-center py-2.5 border border-gray-200 rounded-xl hover:bg-gray-100 hover:shadow-sm transition-all cursor-pointer dark:border-gray-800 dark:hover:bg-gray-800"
                             >
                                 <Github className="w-5 h-5 text-gray-900 dark:text-white" />
@@ -76,7 +83,7 @@ export default function LoginPage() {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => signInWithOAuth('linkedin')}
+                                onClick={() => handleSocialLogin('linkedin')}
                                 className="flex items-center justify-center py-2.5 border border-gray-200 rounded-xl hover:bg-gray-100 hover:shadow-sm transition-all cursor-pointer dark:border-gray-800 dark:hover:bg-gray-800"
                             >
                                 <Linkedin className="w-5 h-5 text-[#0077b5]" />
