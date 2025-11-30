@@ -54,3 +54,21 @@ export async function signout() {
     revalidatePath('/', 'layout')
     redirect('/login')
 }
+
+export async function signInWithOAuth(provider: 'google' | 'github' | 'linkedin') {
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+            redirectTo: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/callback`,
+        },
+    })
+
+    if (data.url) {
+        redirect(data.url)
+    }
+
+    if (error) {
+        return { error: error.message }
+    }
+}
