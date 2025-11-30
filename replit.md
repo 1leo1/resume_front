@@ -11,6 +11,7 @@ The app runs on http://0.0.0.0:5000
 ## Overview
 ResumeAI is a modern, AI-powered resume builder application built with Next.js 16. It allows users to create professional, ATS-friendly resumes with guided workflows, industry-specific templates, and AI enhancement features.
 
+
 ## Project Structure
 ```
 ├── app/                    # Next.js App Router
