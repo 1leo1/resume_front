@@ -1,12 +1,14 @@
 import { create } from 'zustand';
-import { ResumeContent, ResumeDesign } from '@/types/resume';
+import { ResumeContent, ResumeDesign, Template } from '@/types/resume';
 import { Work, Education, Skill, Language, Project, Award, Volunteer } from '@/types/resume';
 
 interface ResumeStore {
     resumeData: ResumeContent;
     design: ResumeDesign;
+    resumeId: number | null;
     setResumeData: (data: ResumeContent) => void;
     setDesign: (design: ResumeDesign) => void;
+    setResumeId: (id: number) => void;
     updateBasics: (field: keyof ResumeContent["basics"], value: unknown) => void;
     // Work Experience
     addWork: (work: Work) => void;
@@ -19,6 +21,9 @@ interface ResumeStore {
     addSkill: (name?: string) => void;
     updateSkill: (index: number, field: string, value: unknown) => void;
     removeSkill: (index: number) => void;
+
+    // Template Management
+    setTemplate: (template: Template) => void;
 
     // Dynamic Sections
     activeSections: string[];
@@ -68,9 +73,39 @@ const initialDesign: ResumeDesign = {
 export const useResumeStore = create<ResumeStore>((set) => ({
     resumeData: initialContent,
     design: initialDesign,
+    resumeId: null,
     activeSections: ["work", "education", "skills"], // Default sections
     setResumeData: (data) => set({ resumeData: data }),
     setDesign: (design) => set({ design }),
+    setResumeId: (id) => set({ resumeId: id }),
+
+    setTemplate: (template) =>
+        set((state) => {
+            // 1. Update Design Layout
+            const newDesign = {
+                ...state.design,
+                layout: template.structure.layout.type as "single-column" | "two-column",
+            };
+
+            // 2. Re-align Active Sections
+            // Extract all sections from the new template's columns
+            const templateSections = template.structure.layout.columns.flatMap(
+                (col: any) => col.sections
+            );
+
+            // We want to keep the user's current active sections if they exist in the new template,
+            // OR if they are custom sections (not in the standard list).
+            // But for simplicity and "best fit", we can just adopt the new template's default sections
+            // and maybe append any non-standard ones the user had active?
+            // For now, let's strictly adopt the template's structure as the "active" view,
+            // because the user chose this template for its structure.
+            // Data is preserved in `resumeData`, so switching back restores it.
+
+            return {
+                design: newDesign,
+                activeSections: templateSections,
+            };
+        }),
 
     updateBasics: (field, value) =>
         set((state) => ({

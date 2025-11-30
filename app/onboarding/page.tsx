@@ -24,7 +24,7 @@ import {
   Award,
   Rocket,
 } from "lucide-react";
-import { Template } from "@/types/template";
+import { Template } from "@/types/resume";
 
 const industries = [
   { id: "tech", name: "Technology", icon: Code, color: "blue" },
@@ -66,7 +66,8 @@ export default function OnboardingPage() {
   const getRecommendedTemplates = () => {
     return templates.filter((t) => {
       // Simple filtering by industry for now
-      return t.industry === selectedIndustry || t.industry === "all";
+      if (!selectedIndustry) return true;
+      return t.industry.includes(selectedIndustry) || t.industry.includes("all");
     }).slice(0, 6);
   };
 

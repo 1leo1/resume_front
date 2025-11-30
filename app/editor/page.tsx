@@ -5,13 +5,15 @@ import { useSearchParams } from "next/navigation";
 import { useResumeStore } from "@/store/useResumeStore";
 import {
   Download, Palette, Share2, FileText, Type, Layout,
-  Undo2, Redo2, Eye, History, ChevronRight, X, Check, PlusCircle
+  Undo2, Redo2, Eye, History, ChevronRight, X, Check, PlusCircle, Loader2, Save
 } from "lucide-react";
 import Link from "next/link";
 import DynamicResumeRenderer from "@/components/DynamicResumeRenderer";
 import AddSectionModal from "@/components/AddSectionModal";
-import { Template } from "@/types/template";
+import { Template } from "@/types/resume";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAutoSave } from "@/hooks/useAutoSave";
+import { initGuestSession, api } from "@/utils/api";
 
 function EditorContent() {
   const searchParams = useSearchParams();
@@ -19,6 +21,7 @@ function EditorContent() {
 
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Drawer State
   const [activeDrawer, setActiveDrawer] = useState<"templates" | "design" | "history" | null>(null);
@@ -30,70 +33,57 @@ function EditorContent() {
     resumeData,
     setResumeData,
     design,
-    setDesign
+    setDesign,
+    resumeId,
+    setResumeId,
+    setTemplate
   } = useResumeStore();
 
-  // Dummy Data Seeding
+  const { isSaving, lastSaved } = useAutoSave();
+
+  // Initialize Session and Resume
   useEffect(() => {
-    if (!resumeData.basics.name && resumeData.work.length === 0) {
-      setResumeData({
-        basics: {
-          name: "John Doe",
-          email: "john@example.com",
-          phone: "+1 (555) 123-4567",
-          summary: "Passionate software engineer with 5+ years of experience in building scalable web applications. Proven track record of delivering high-quality code and leading teams.",
-          location: {
-            city: "San Francisco",
-            region: "CA"
-          },
-          url: "johndoe.dev"
-        },
-        work: [
-          {
-            name: "Tech Solutions Inc.",
-            position: "Senior Frontend Engineer",
-            startDate: "2021",
-            endDate: "Present",
-            summary: "Leading the frontend migration to Next.js. Improved site performance by 40%. Mentoring junior developers.",
-            highlights: []
-          },
-          {
-            name: "WebStartups LLC",
-            position: "Full Stack Developer",
-            startDate: "2018",
-            endDate: "2021",
-            summary: "Developed and maintained multiple client projects using React and Node.js. Implemented CI/CD pipelines.",
-            highlights: []
+    const init = async () => {
+      try {
+        await initGuestSession();
+
+        const savedId = localStorage.getItem("active_resume_id");
+
+        if (savedId) {
+          try {
+            const resume = await api.get(`/resumes/${savedId}`);
+            setResumeData(resume.content);
+            setDesign(resume.design);
+            setResumeId(resume.id);
+            setIsLoading(false);
+            return;
+          } catch (e) {
+            console.warn("Failed to load saved resume, creating new one.", e);
+            localStorage.removeItem("active_resume_id");
           }
-        ],
-        education: [
-          {
-            institution: "University of Technology",
-            area: "Computer Science",
-            studyType: "Bachelor of Science",
-            startDate: "2014",
-            endDate: "2018",
-            score: "3.8 GPA",
-            courses: []
-          }
-        ],
-        skills: [
-          { name: "React", level: "Expert" },
-          { name: "TypeScript", level: "Advanced" },
-          { name: "Node.js", level: "Advanced" },
-          { name: "Tailwind CSS", level: "Expert" },
-          { name: "PostgreSQL", level: "Intermediate" }
-        ],
-        languages: [],
-        projects: [],
-        awards: [],
-        volunteer: [],
-        references: [],
-        publications: []
-      });
-    }
+        }
+
+        // Create new resume if none found or load failed
+        const newResume = await api.post("/resumes", {
+          title: "My Resume",
+          content: resumeData, // Use initial store data (dummy or empty)
+          design: design
+        });
+
+        setResumeId(newResume.id);
+        localStorage.setItem("active_resume_id", newResume.id.toString());
+        setIsLoading(false);
+
+      } catch (error) {
+        console.error("Initialization failed:", error);
+        setIsLoading(false);
+      }
+    };
+
+    init();
   }, []);
 
+  // Fetch Templates
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
@@ -106,7 +96,14 @@ function EditorContent() {
             const initialTemplate = templateIdParam
               ? data.find((t: Template) => t.id === parseInt(templateIdParam))
               : data[0];
+
+            // If we have a selected template, we might want to apply it?
+            // Only if it's a fresh load or user explicitly selected it.
+            // For now just set state.
             setSelectedTemplate(initialTemplate || data[0]);
+
+            // If it's a fresh start (no resumeId yet or just created), maybe apply template?
+            // But we handle that via user interaction usually.
           }
         }
       } catch (error) {
@@ -115,6 +112,12 @@ function EditorContent() {
     };
     fetchTemplates();
   }, [templateIdParam]);
+
+  // Handle Template Selection
+  const handleTemplateSelect = (template: Template) => {
+    setSelectedTemplate(template);
+    setTemplate(template); // Update store
+  };
 
   const toggleDrawer = (drawer: "templates" | "design" | "history") => {
     setActiveDrawer(activeDrawer === drawer ? null : drawer);
@@ -159,6 +162,15 @@ function EditorContent() {
     </button>
   );
 
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <p className="text-gray-500">Loading your resume...</p>
+      </div>
+    </div>;
+  }
+
   return (
     <div className="flex h-screen flex-col bg-gray-100 dark:bg-gray-900">
       {/* Header */}
@@ -175,6 +187,19 @@ function EditorContent() {
             defaultValue="My Resume"
             className="text-lg font-semibold bg-transparent border-none outline-none focus:ring-0 w-40"
           />
+          <div className="flex items-center gap-2 text-xs text-gray-400 ml-4">
+            {isSaving ? (
+              <>
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Saving...
+              </>
+            ) : lastSaved ? (
+              <>
+                <Check className="w-3 h-3 text-green-500" />
+                Saved
+              </>
+            ) : null}
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 mr-4 border-r pr-4 dark:border-gray-800">
@@ -296,7 +321,7 @@ function EditorContent() {
                       {templates.map((template) => (
                         <button
                           key={template.id}
-                          onClick={() => setSelectedTemplate(template)}
+                          onClick={() => handleTemplateSelect(template)}
                           className={`group relative aspect-[210/297] w-full overflow-hidden rounded-lg border-2 transition-all ${selectedTemplate?.id === template.id
                             ? "border-blue-600 ring-2 ring-blue-600/20"
                             : "border-gray-200 hover:border-blue-400 dark:border-gray-800"

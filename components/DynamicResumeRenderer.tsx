@@ -2,7 +2,7 @@
 
 import { useResumeStore } from "@/store/useResumeStore";
 import { useShallow } from 'zustand/react/shallow';
-import { Template } from "@/types/template";
+import { Template } from "@/types/resume";
 import { Mail, Phone, MapPin, Globe, Plus, Trash2, GripVertical } from "lucide-react";
 import EditableElement from "./EditableElement";
 import {

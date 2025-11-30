@@ -12,6 +12,42 @@ export interface Profile {
     url: string;
 }
 
+// Placeholder interfaces for Template dependencies
+export interface TemplateColumn {
+    width: string;
+    sections: string[];
+}
+
+export interface TemplateLayout {
+    type: "single-column" | "two-column";
+    columns: TemplateColumn[];
+}
+
+export interface TemplateStructure {
+    layout: TemplateLayout;
+    sections: Record<string, unknown>; // or more specific type if needed
+}
+
+export interface TemplateStyles {
+    primary: string;
+    accent: string;
+    font: string;
+}
+
+export interface Template {
+    id: number;
+    slug: string;
+    name: string;
+    description: string;
+    industry: string[];
+    tags: string[];
+    structure: TemplateStructure;
+    styles: TemplateStyles;
+    thumbnail_url?: string;
+    dummy_data?: ResumeContent;
+    is_premium: boolean;
+}
+
 export interface Basics {
     name: string;
     label?: string;
