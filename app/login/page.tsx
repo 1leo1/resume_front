@@ -65,24 +65,20 @@ export default function LoginPage() {
 
                     <div className="space-y-6">
                         {/* OAuth Buttons */}
-                        <div className="grid grid-cols-3 gap-3">
-                            <button
-                                onClick={() => signInWithOAuth('google')}
-                                className="flex items-center justify-center py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors dark:border-gray-800 dark:hover:bg-gray-900"
-                            >
-                                <Chrome className="w-5 h-5 text-gray-900 dark:text-white" />
-                            </button>
+                        <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => signInWithOAuth('github')}
                                 className="flex items-center justify-center py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors dark:border-gray-800 dark:hover:bg-gray-900"
                             >
                                 <Github className="w-5 h-5 text-gray-900 dark:text-white" />
+                                <span className="ml-2 text-sm font-medium">GitHub</span>
                             </button>
                             <button
                                 onClick={() => signInWithOAuth('linkedin')}
                                 className="flex items-center justify-center py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors dark:border-gray-800 dark:hover:bg-gray-900"
                             >
                                 <Linkedin className="w-5 h-5 text-[#0077b5]" />
+                                <span className="ml-2 text-sm font-medium">LinkedIn</span>
                             </button>
                         </div>
 
