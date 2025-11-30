@@ -13,12 +13,11 @@ const nextConfig: NextConfig = {
     ]
   },
   async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
     return [
       {
         source: '/api/:path*',
-        destination: process.env.NODE_ENV === 'development'
-          ? 'http://127.0.0.1:8000/:path*'
-          : '/api/:path*', // In Vercel, if backend is in /api, this might just work or need full URL
+        destination: `${apiUrl}/:path*`,
       },
     ]
   },
