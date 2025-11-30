@@ -3,9 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, FileText, Sparkles, Upload, CheckCircle, Star, Zap, Shield, BarChart3, Users, Award, Briefcase, GraduationCap, Stethoscope, Palette, TrendingUp } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useResumeStore } from "@/store/useResumeStore";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -29,7 +28,7 @@ const testimonials = [
   {
     name: "Sarah Chen",
     role: "Software Engineer at Google",
-    content: "ResumeAI helped me land my dream job! The AI suggestions were spot-on and the templates are stunning.",
+    content: "ClayCV helped me land my dream job! The AI suggestions were spot-on and the templates are stunning.",
     avatar: "SC",
   },
   {
@@ -48,7 +47,7 @@ const testimonials = [
 
 const faqs = [
   {
-    question: "Is ResumeAI free to use?",
+    question: "Is ClayCV free to use?",
     answer: "Yes! You can create and download resumes for free. Premium templates and AI features are available with our Pro plan.",
   },
   {
@@ -66,39 +65,20 @@ const faqs = [
 ];
 
 export default function Home() {
-  const router = useRouter();
-  const [isUploading, setIsUploading] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const { setResumeData } = useResumeStore();
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    setIsUploading(true);
-    
-    setTimeout(() => {
-      setResumeData({
-        name: "",
-        email: "",
-        phone: "",
-        summary: "",
-        education: [],
-        experience: [],
-        skills: []
-      });
-      router.push("/editor");
-    }, 1500);
-  };
+
 
   return (
     <main className="min-h-screen bg-white dark:bg-gray-950">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900" />
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl" />
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl" />
-        
+
         <div className="container relative mx-auto px-4 md:px-6">
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
             <motion.div
@@ -112,7 +92,7 @@ export default function Home() {
                 AI-Powered Resume Builder
               </span>
             </motion.div>
-            
+
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -126,17 +106,17 @@ export default function Home() {
               <br />
               in Minutes
             </motion.h1>
-            
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl"
+              className="text-xl text-gray-700 dark:text-gray-300 mb-10 max-w-2xl"
             >
-              Create stunning, ATS-friendly resumes with AI-powered suggestions. 
+              Create stunning, ATS-friendly resumes with AI-powered suggestions.
               Choose from 100+ industry-specific templates and land your dream job.
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -151,23 +131,14 @@ export default function Home() {
               </Link>
               <Link
                 href="/onboarding"
-                className="inline-flex h-14 items-center justify-center rounded-full border-2 border-gray-200 bg-white px-8 text-base font-medium shadow-sm hover:border-blue-300 hover:bg-blue-50 transition-all dark:border-gray-700 dark:bg-gray-900 dark:hover:border-blue-600 dark:hover:bg-gray-800"
+                className="inline-flex h-14 items-center justify-center rounded-full border-2 border-gray-200 bg-white px-8 text-base font-medium text-gray-900 shadow-sm hover:border-blue-300 hover:bg-blue-50 transition-all dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:hover:border-blue-600 dark:hover:bg-gray-800"
               >
                 <Upload className="mr-2 h-5 w-5 text-blue-600" /> Upload Existing Resume
               </Link>
             </motion.div>
-            
-            {isUploading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center gap-2 text-blue-600"
-              >
-                <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                <span>Analyzing your resume...</span>
-              </motion.div>
-            )}
-            
+
+
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -207,7 +178,7 @@ export default function Home() {
                 <div className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 mb-2">
                   {stat.value}
                 </div>
-                <div className="text-gray-600 dark:text-gray-400">{stat.label}</div>
+                <div className="text-gray-700 dark:text-gray-300">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -224,14 +195,14 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
               Create Your Resume in <span className="text-blue-600">3 Easy Steps</span>
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
               Our streamlined process makes building a professional resume quick and effortless.
             </p>
           </motion.div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { step: "01", title: "Choose a Template", description: "Browse 100+ industry-specific templates designed by HR experts and choose the one that fits your style.", icon: FileText },
@@ -253,8 +224,8 @@ export default function Home() {
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center mb-6">
                     <item.icon className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">{item.description}</p>
+                  <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">{item.title}</h3>
+                  <p className="text-gray-700 dark:text-gray-300">{item.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -272,14 +243,14 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
               Powerful Features for <span className="text-blue-600">Job Seekers</span>
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
               Everything you need to create a standout resume that gets you noticed.
             </p>
           </motion.div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { icon: Sparkles, title: "AI-Powered Suggestions", description: "Get smart recommendations to improve your bullet points and make your achievements shine.", color: "text-purple-500" },
@@ -298,8 +269,8 @@ export default function Home() {
                 className="bg-white dark:bg-gray-800 rounded-2xl p-6 hover:shadow-lg transition-shadow"
               >
                 <feature.icon className={`w-10 h-10 ${feature.color} mb-4`} />
-                <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">{feature.description}</p>
+                <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">{feature.title}</h3>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -316,14 +287,14 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
               Templates for <span className="text-blue-600">Every Industry</span>
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
               Find the perfect template that matches your profession and personal style.
             </p>
           </motion.div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {templates.map((template, index) => (
               <motion.div
@@ -346,7 +317,7 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
-          
+
           <div className="text-center">
             <Link
               href="/templates"
@@ -368,14 +339,14 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
               Loved by <span className="text-blue-600">Professionals</span>
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Join thousands of job seekers who landed their dream jobs using ResumeAI.
+            <p className="text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
+              Join thousands of job seekers who landed their dream jobs using ClayCV.
             </p>
           </motion.div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <motion.div
@@ -391,14 +362,14 @@ export default function Home() {
                     <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">&ldquo;{testimonial.content}&rdquo;</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-6">&ldquo;{testimonial.content}&rdquo;</p>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold">
                     {testimonial.avatar}
                   </div>
                   <div>
                     <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{testimonial.role}</div>
                   </div>
                 </div>
               </motion.div>
@@ -417,11 +388,11 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
               Frequently Asked <span className="text-blue-600">Questions</span>
             </h2>
           </motion.div>
-          
+
           <div className="space-y-4">
             {faqs.map((faq, index) => (
               <motion.div
@@ -436,7 +407,7 @@ export default function Home() {
                   className="w-full bg-white dark:bg-gray-800 rounded-xl p-6 text-left hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold pr-4">{faq.question}</h3>
+                    <h3 className="font-semibold pr-4 text-gray-900 dark:text-white">{faq.question}</h3>
                     <div className={`w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center transition-transform ${openFaq === index ? "rotate-45" : ""}`}>
                       <span className="text-blue-600 text-xl leading-none">+</span>
                     </div>
@@ -445,7 +416,7 @@ export default function Home() {
                     <motion.p
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
-                      className="text-gray-600 dark:text-gray-400 mt-4"
+                      className="text-gray-700 dark:text-gray-300 mt-4"
                     >
                       {faq.answer}
                     </motion.p>
@@ -470,7 +441,7 @@ export default function Home() {
               Ready to Build Your Perfect Resume?
             </h2>
             <p className="text-white/90 mb-8 max-w-2xl mx-auto">
-              Join over 50,000 professionals who have landed their dream jobs with ResumeAI.
+              Join over 50,000 professionals who have landed their dream jobs with ClayCV.
             </p>
             <Link
               href="/onboarding"

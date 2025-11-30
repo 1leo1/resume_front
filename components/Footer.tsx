@@ -13,7 +13,7 @@ export default function Footer() {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
                 <FileText className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">ResumeAI</span>
+              <span className="text-xl font-bold text-white">ClayCV</span>
             </Link>
             <p className="text-sm text-gray-400 mb-4">
               Build stunning, ATS-friendly resumes with AI-powered enhancements.
@@ -64,7 +64,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-400">
-            &copy; {new Date().getFullYear()} ResumeAI. All rights reserved.
+            &copy; {new Date().getFullYear()} ClayCV. All rights reserved.
           </p>
           <div className="flex gap-6">
             <a href="#" className="text-sm text-gray-400 hover:text-white transition-colors">Privacy</a>

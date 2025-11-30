@@ -28,7 +28,7 @@ export default function UploadPage() {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
       handleFile(droppedFile);
@@ -48,7 +48,7 @@ export default function UploadPage() {
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "text/plain"
     ];
-    
+
     if (!validTypes.includes(uploadedFile.type)) {
       setUploadStatus("error");
       return;
@@ -68,46 +68,60 @@ export default function UploadPage() {
       });
     }, 150);
 
-    setTimeout(() => {
-      clearInterval(uploadInterval);
+    const formData = new FormData();
+    formData.append("file", uploadedFile);
+
+    try {
+      // Get Supabase session token
+      const { createClient } = await import("@/utils/supabase/client");
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+
+      // Use relative path /api/upload which will be rewritten to the backend
+      // Or use the full URL if running separately. For Vercel, /api/index.py handles it.
+      // But wait, the rewrite in vercel.json is for the backend repo.
+      // If frontend and backend are in the same Vercel project, we need to configure rewrites in next.config.ts
+      // For now, let's assume we are hitting the backend URL directly or via Next.js rewrite.
+      // Since I haven't set up Next.js rewrites yet, I should probably do that or use the full URL.
+      // But the user said "using vercel for UI and python", implying maybe a single repo or separate?
+      // Given the structure, it looks like a monorepo or separate folders.
+      // If deployed separately, we need the backend URL.
+      // For local dev, it's localhost:8000.
+      // Let's use an env var for API_URL or default to /api if using rewrites.
+      // I will use /api/upload and configure next.config.ts to rewrite to localhost:8000 in dev.
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const result = await response.json();
+
+      // Update store with parsed data
+      if (result.data) {
+        setResumeData(result.data);
+      }
+
       setProgress(100);
-      setUploadStatus("processing");
-      
-      setTimeout(() => {
-        setResumeData({
-          name: "John Doe",
-          email: "john.doe@email.com",
-          phone: "+1 (555) 123-4567",
-          summary: "Experienced professional with a proven track record of delivering results. Skilled in project management, team leadership, and strategic planning.",
-          education: [
-            {
-              institution: "State University",
-              degree: "Bachelor of Science in Computer Science",
-              start_date: "2015",
-              end_date: "2019",
-              description: ""
-            }
-          ],
-          experience: [
-            {
-              company: "Tech Company Inc.",
-              position: "Senior Software Engineer",
-              start_date: "Jan 2020",
-              end_date: "Present",
-              description: "Led development of key features, mentored junior developers, and improved system performance by 40%."
-            }
-          ],
-          skills: [
-            { name: "JavaScript", level: "Expert" },
-            { name: "React", level: "Expert" },
-            { name: "Node.js", level: "Advanced" },
-            { name: "Python", level: "Intermediate" }
-          ]
-        });
-        
-        setUploadStatus("success");
-      }, 2000);
-    }, 1500);
+      setUploadStatus("success");
+    } catch (error) {
+      console.error("Upload error:", error);
+      setUploadStatus("error");
+    } finally {
+      clearInterval(uploadInterval);
+    }
   };
 
   const removeFile = () => {
@@ -155,19 +169,17 @@ export default function UploadPage() {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`relative rounded-2xl border-2 border-dashed transition-all ${
-                isDragging
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                  : uploadStatus === "error"
+              className={`relative rounded-2xl border-2 border-dashed transition-all ${isDragging
+                ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                : uploadStatus === "error"
                   ? "border-red-300 bg-red-50 dark:bg-red-900/20"
                   : "border-gray-200 bg-white hover:border-blue-300 dark:border-gray-700 dark:bg-gray-900"
-              }`}
+                }`}
             >
               {!file ? (
                 <label className="flex flex-col items-center justify-center p-12 cursor-pointer">
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 ${
-                    isDragging ? "bg-blue-100 dark:bg-blue-800" : "bg-gray-100 dark:bg-gray-800"
-                  }`}>
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 ${isDragging ? "bg-blue-100 dark:bg-blue-800" : "bg-gray-100 dark:bg-gray-800"
+                    }`}>
                     <Upload className={`w-8 h-8 ${isDragging ? "text-blue-600" : "text-gray-400"}`} />
                   </div>
                   <p className="text-lg font-medium mb-2">

@@ -116,7 +116,7 @@ export default function FeaturesPage() {
               Everything You Need to{" "}
               <span className="text-blue-600 dark:text-blue-400">Land Your Dream Job</span>
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
               Our comprehensive suite of tools helps you create professional resumes that get noticed by recruiters and pass ATS systems.
             </p>
           </motion.div>
@@ -141,8 +141,8 @@ export default function FeaturesPage() {
                   <div className={`w-12 h-12 rounded-xl ${colors.lightBg} flex items-center justify-center mb-4`}>
                     <feature.icon className={`w-6 h-6 ${colors.text}`} />
                   </div>
-                  <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                  <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">{feature.title}</h3>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                     {feature.description}
                   </p>
                 </motion.div>

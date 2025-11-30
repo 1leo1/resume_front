@@ -103,11 +103,11 @@ export default function PricingPage() {
               <Star className="w-4 h-4" />
               Simple Pricing
             </span>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
               Choose the Plan That{" "}
               <span className="text-blue-600">Fits Your Needs</span>
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
               Start for free and upgrade when you need more features. No hidden fees, cancel anytime.
             </p>
           </motion.div>
@@ -124,11 +124,10 @@ export default function PricingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className={`relative rounded-2xl p-8 ${
-                  plan.popular
+                className={`relative rounded-2xl p-8 ${plan.popular
                     ? "bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-500/25 scale-105"
                     : "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800"
-                }`}
+                  }`}
               >
                 {plan.popular && (
                   <span className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-medium">
@@ -137,19 +136,19 @@ export default function PricingPage() {
                 )}
 
                 <div className="mb-6">
-                  <h3 className={`text-xl font-bold mb-2 ${plan.popular ? "text-white" : ""}`}>
+                  <h3 className={`text-xl font-bold mb-2 ${plan.popular ? "text-white" : "text-gray-900 dark:text-white"}`}>
                     {plan.name}
                   </h3>
-                  <p className={`text-sm ${plan.popular ? "text-blue-100" : "text-gray-600 dark:text-gray-400"}`}>
+                  <p className={`text-sm ${plan.popular ? "text-blue-100" : "text-gray-700 dark:text-gray-300"}`}>
                     {plan.description}
                   </p>
                 </div>
 
                 <div className="mb-6">
-                  <span className={`text-4xl font-bold ${plan.popular ? "text-white" : ""}`}>
+                  <span className={`text-4xl font-bold ${plan.popular ? "text-white" : "text-gray-900 dark:text-white"}`}>
                     {plan.price}
                   </span>
-                  <span className={`${plan.popular ? "text-blue-100" : "text-gray-500"}`}>
+                  <span className={`${plan.popular ? "text-blue-100" : "text-gray-600 dark:text-gray-400"}`}>
                     {plan.period}
                   </span>
                 </div>
@@ -158,7 +157,7 @@ export default function PricingPage() {
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
                       <Check className={`w-5 h-5 shrink-0 ${plan.popular ? "text-blue-200" : "text-green-500"}`} />
-                      <span className={`text-sm ${plan.popular ? "text-blue-100" : "text-gray-600 dark:text-gray-400"}`}>
+                      <span className={`text-sm ${plan.popular ? "text-blue-100" : "text-gray-700 dark:text-gray-300"}`}>
                         {feature}
                       </span>
                     </li>
@@ -175,11 +174,10 @@ export default function PricingPage() {
 
                 <Link
                   href="/editor"
-                  className={`block w-full py-3 rounded-xl text-center font-medium transition-all ${
-                    plan.popular
+                  className={`block w-full py-3 rounded-xl text-center font-medium transition-all ${plan.popular
                       ? "bg-white text-blue-600 hover:bg-blue-50"
                       : "bg-blue-600 text-white hover:bg-blue-700"
-                  }`}
+                    }`}
                 >
                   {plan.cta}
                 </Link>
@@ -198,7 +196,7 @@ export default function PricingPage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Frequently Asked Questions</h2>
           </motion.div>
 
           <div className="space-y-4">
@@ -211,8 +209,8 @@ export default function PricingPage() {
                 viewport={{ once: true }}
                 className="bg-white dark:bg-gray-800 rounded-xl p-6"
               >
-                <h3 className="font-semibold mb-2">{faq.question}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">{faq.answer}</p>
+                <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">{faq.question}</h3>
+                <p className="text-gray-700 dark:text-gray-300 text-sm">{faq.answer}</p>
               </motion.div>
             ))}
           </div>
@@ -228,8 +226,8 @@ export default function PricingPage() {
             viewport={{ once: true }}
           >
             <Sparkles className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-4">Still have questions?</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Still have questions?</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-6">
               Our team is here to help. Contact us anytime.
             </p>
             <a

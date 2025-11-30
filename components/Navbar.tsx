@@ -2,14 +2,30 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
-import { Menu, X, ChevronDown, User, LogOut, FileText } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, FileText } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
+import { User } from "@supabase/supabase-js";
+import { signout } from "@/app/login/actions";
 
 export default function Navbar() {
-  const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
 
   return (
     <motion.nav
@@ -24,7 +40,7 @@ export default function Navbar() {
               <FileText className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
-              ResumeAI
+              ClayCV
             </span>
           </Link>
 
@@ -41,59 +57,26 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            {session ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white text-sm font-medium">
-                    {session.user?.name?.charAt(0).toUpperCase() || "U"}
-                  </div>
-                  <span className="text-sm font-medium">{session.user?.name?.split(" ")[0]}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {isProfileOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 dark:bg-gray-900 dark:border-gray-800 overflow-hidden"
-                  >
-                    <Link
-                      href="/dashboard"
-                      className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                    >
-                      <User className="w-4 h-4" />
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/editor"
-                      className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                    >
-                      <FileText className="w-4 h-4" />
-                      My Resumes
-                    </Link>
-                    <hr className="border-gray-100 dark:border-gray-800" />
-                    <button
-                      onClick={() => signOut()}
-                      className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Sign Out
-                    </button>
-                  </motion.div>
-                )}
-              </div>
+            {user ? (
+              <>
+                <Link href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+                  Dashboard
+                </Link>
+                <form action={signout}>
+                  <button type="submit" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+                    Sign Out
+                  </button>
+                </form>
+              </>
             ) : (
               <>
-                <Link
-                  href="/auth/signin"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors"
-                >
-                  Sign In
+                <Link href="/login">
+                  <button className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+                    Sign In
+                  </button>
                 </Link>
                 <Link
-                  href="/onboarding"
+                  href="/login"
                   className="inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-6 text-sm font-medium text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all hover:scale-105"
                 >
                   Get Started Free
@@ -127,25 +110,26 @@ export default function Navbar() {
                 Pricing
               </Link>
               <hr className="border-gray-100 dark:border-gray-800" />
-              {session ? (
+              {user ? (
                 <>
                   <Link href="/dashboard" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
                     Dashboard
                   </Link>
-                  <button
-                    onClick={() => signOut()}
-                    className="text-sm font-medium text-red-600 text-left"
-                  >
-                    Sign Out
-                  </button>
+                  <form action={signout}>
+                    <button type="submit" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+                      Sign Out
+                    </button>
+                  </form>
                 </>
               ) : (
                 <>
-                  <Link href="/auth/signin" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
-                    Sign In
+                  <Link href="/login">
+                    <button className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors text-left">
+                      Sign In
+                    </button>
                   </Link>
                   <Link
-                    href="/onboarding"
+                    href="/login"
                     className="inline-flex h-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-6 text-sm font-medium text-white"
                   >
                     Get Started Free

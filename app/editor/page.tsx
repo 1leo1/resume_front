@@ -1,39 +1,168 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useResumeStore } from "@/store/useResumeStore";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Sparkles, Download, Eye, Palette, Plus, Trash2, 
-  ChevronDown, ChevronUp, GripVertical, Save, Share2,
-  Briefcase, GraduationCap, Award, Code, User, Mail, Phone, MapPin
+import {
+  Download, Palette, Share2, FileText, Type, Layout,
+  Undo2, Redo2, Eye, History, ChevronRight, X, Check, PlusCircle
 } from "lucide-react";
 import Link from "next/link";
+import DynamicResumeRenderer from "@/components/DynamicResumeRenderer";
+import AddSectionModal from "@/components/AddSectionModal";
+import { Template } from "@/types/template";
+import { motion, AnimatePresence } from "framer-motion";
 
-const templates = [
-  { id: 1, name: "Modern", color: "blue" },
-  { id: 2, name: "Professional", color: "gray" },
-  { id: 3, name: "Creative", color: "purple" },
-  { id: 4, name: "Minimal", color: "slate" },
-  { id: 5, name: "Executive", color: "emerald" },
-];
-
-const sampleSkills = ["JavaScript", "React", "Node.js", "Python", "SQL", "AWS", "Docker", "Git"];
-
-export default function EditorPage() {
+function EditorContent() {
   const searchParams = useSearchParams();
-  const templateId = searchParams.get("template");
-  const [selectedTemplate, setSelectedTemplate] = useState(templateId ? parseInt(templateId) : 1);
-  const [activeSection, setActiveSection] = useState<string | null>("personal");
-  const [showTemplates, setShowTemplates] = useState(false);
+  const templateIdParam = searchParams.get("template");
 
-  const { resumeData, updateField, addExperience, addEducation, addSkill } = useResumeStore();
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+
+  // Drawer State
+  const [activeDrawer, setActiveDrawer] = useState<"templates" | "design" | "history" | null>(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+  const [isFontDropdownOpen, setIsFontDropdownOpen] = useState(false);
+
+  const {
+    resumeData,
+    setResumeData,
+    design,
+    setDesign
+  } = useResumeStore();
+
+  // Dummy Data Seeding
+  useEffect(() => {
+    if (!resumeData.basics.name && resumeData.work.length === 0) {
+      setResumeData({
+        basics: {
+          name: "John Doe",
+          email: "john@example.com",
+          phone: "+1 (555) 123-4567",
+          summary: "Passionate software engineer with 5+ years of experience in building scalable web applications. Proven track record of delivering high-quality code and leading teams.",
+          location: {
+            city: "San Francisco",
+            region: "CA"
+          },
+          url: "johndoe.dev"
+        },
+        work: [
+          {
+            name: "Tech Solutions Inc.",
+            position: "Senior Frontend Engineer",
+            startDate: "2021",
+            endDate: "Present",
+            summary: "Leading the frontend migration to Next.js. Improved site performance by 40%. Mentoring junior developers.",
+            highlights: []
+          },
+          {
+            name: "WebStartups LLC",
+            position: "Full Stack Developer",
+            startDate: "2018",
+            endDate: "2021",
+            summary: "Developed and maintained multiple client projects using React and Node.js. Implemented CI/CD pipelines.",
+            highlights: []
+          }
+        ],
+        education: [
+          {
+            institution: "University of Technology",
+            area: "Computer Science",
+            studyType: "Bachelor of Science",
+            startDate: "2014",
+            endDate: "2018",
+            score: "3.8 GPA",
+            courses: []
+          }
+        ],
+        skills: [
+          { name: "React", level: "Expert" },
+          { name: "TypeScript", level: "Advanced" },
+          { name: "Node.js", level: "Advanced" },
+          { name: "Tailwind CSS", level: "Expert" },
+          { name: "PostgreSQL", level: "Intermediate" }
+        ],
+        languages: [],
+        projects: [],
+        awards: [],
+        volunteer: [],
+        references: [],
+        publications: []
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const res = await fetch("/api/templates/");
+        if (res.ok) {
+          const data = await res.json();
+          setTemplates(data);
+
+          if (data.length > 0) {
+            const initialTemplate = templateIdParam
+              ? data.find((t: Template) => t.id === parseInt(templateIdParam))
+              : data[0];
+            setSelectedTemplate(initialTemplate || data[0]);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch templates", error);
+      }
+    };
+    fetchTemplates();
+  }, [templateIdParam]);
+
+  const toggleDrawer = (drawer: "templates" | "design" | "history") => {
+    setActiveDrawer(activeDrawer === drawer ? null : drawer);
+  };
+
+  const ActionRow = ({
+    icon: Icon,
+    label,
+    subLabel,
+    onClick,
+    isActive,
+    iconColorClass
+  }: {
+    icon: any,
+    label: string,
+    subLabel?: string,
+    onClick?: () => void,
+    isActive?: boolean,
+    iconColorClass?: string
+  }) => (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-4 p-4 transition-all border-b border-gray-100 dark:border-gray-800 text-left group relative ${isActive ? "bg-blue-50 dark:bg-blue-900/20" : "hover:bg-gray-50 dark:hover:bg-gray-800"
+        }`}
+    >
+      {isActive && (
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600" />
+      )}
+      <div className={`p-2.5 rounded-xl transition-colors ${isActive
+        ? "bg-blue-100 text-blue-600 dark:bg-blue-800 dark:text-blue-300"
+        : `${iconColorClass || "bg-gray-100 text-gray-600"} group-hover:opacity-80`
+        }`}>
+        <Icon className="w-5 h-5" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className={`font-medium ${isActive ? "text-blue-900 dark:text-blue-100" : "text-gray-900 dark:text-gray-100"}`}>
+          {label}
+        </div>
+        {subLabel && <div className="text-xs text-gray-500 mt-0.5">{subLabel}</div>}
+      </div>
+      <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${isActive ? "rotate-90" : ""}`} />
+    </button>
+  );
 
   return (
     <div className="flex h-screen flex-col bg-gray-100 dark:bg-gray-900">
       {/* Header */}
-      <header className="flex h-16 items-center justify-between border-b bg-white px-6 dark:bg-gray-950 dark:border-gray-800 shrink-0">
+      <header className="flex h-16 items-center justify-between border-b bg-white px-6 dark:bg-gray-950 dark:border-gray-800 shrink-0 z-20 relative shadow-sm">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
@@ -48,582 +177,281 @@ export default function EditorPage() {
           />
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
-            <Save className="w-4 h-4" />
-            Save
-          </button>
+          <div className="flex items-center gap-1 mr-4 border-r pr-4 dark:border-gray-800">
+            <button className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800" title="Undo">
+              <Undo2 className="w-4 h-4" />
+            </button>
+            <button className="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800" title="Redo">
+              <Redo2 className="w-4 h-4" />
+            </button>
+          </div>
           <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
             <Share2 className="w-4 h-4" />
             Share
           </button>
-          <button
-            onClick={() => window.print()}
-            className="flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-medium shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all"
-          >
+          <button className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20">
             <Download className="w-4 h-4" />
             Download PDF
           </button>
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Panel - Editor */}
-        <div className="w-[420px] overflow-y-auto border-r bg-white dark:bg-gray-950 dark:border-gray-800 shrink-0">
-          {/* Template Selector */}
-          <div className="p-4 border-b dark:border-gray-800">
-            <button
-              onClick={() => setShowTemplates(!showTemplates)}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-800 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Palette className="w-5 h-5 text-blue-600" />
-                <span className="font-medium">Template: {templates.find(t => t.id === selectedTemplate)?.name}</span>
-              </div>
-              {showTemplates ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-            </button>
-            
-            <AnimatePresence>
-              {showTemplates && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="grid grid-cols-5 gap-2 pt-4">
-                    {templates.map((template) => (
-                      <button
-                        key={template.id}
-                        onClick={() => {
-                          setSelectedTemplate(template.id);
-                          setShowTemplates(false);
-                        }}
-                        className={`aspect-[3/4] rounded-lg border-2 transition-all ${
-                          selectedTemplate === template.id
-                            ? "border-blue-600 ring-2 ring-blue-600/20"
-                            : "border-gray-200 hover:border-gray-300 dark:border-gray-700"
-                        }`}
-                      >
-                        <div className={`w-full h-full rounded-md bg-gradient-to-b from-${template.color}-100 to-${template.color}-50 dark:from-${template.color}-900/20 dark:to-${template.color}-800/10`} />
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Left Panel - Action Rows */}
+        <div className="w-56 border-r bg-white flex flex-col dark:bg-gray-950 dark:border-gray-800 z-10 shrink-0">
+          <div className="p-6 border-b dark:border-gray-800">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Actions</h2>
+            <p className="text-sm text-gray-500 mt-1">Manage your resume</p>
           </div>
 
-          {/* Sections */}
-          <div className="divide-y dark:divide-gray-800">
-            {/* Personal Info Section */}
-            <SectionAccordion
-              title="Personal Information"
-              icon={User}
-              isOpen={activeSection === "personal"}
-              onToggle={() => setActiveSection(activeSection === "personal" ? null : "personal")}
-            >
-              <div className="space-y-4">
-                <InputField
-                  label="Full Name"
-                  icon={User}
-                  value={resumeData.name}
-                  onChange={(value) => updateField("name", value)}
-                  placeholder="John Doe"
-                />
-                <InputField
-                  label="Email"
-                  icon={Mail}
-                  type="email"
-                  value={resumeData.email}
-                  onChange={(value) => updateField("email", value)}
-                  placeholder="john@example.com"
-                />
-                <InputField
-                  label="Phone"
-                  icon={Phone}
-                  value={resumeData.phone}
-                  onChange={(value) => updateField("phone", value)}
-                  placeholder="+1 (555) 000-0000"
-                />
-                <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
-                    Professional Summary
-                  </label>
-                  <div className="relative">
-                    <textarea
-                      className="w-full rounded-lg border border-gray-200 p-3 text-sm min-h-[100px] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all dark:bg-gray-900 dark:border-gray-700"
-                      value={resumeData.summary}
-                      onChange={(e) => updateField("summary", e.target.value)}
-                      placeholder="A brief summary of your professional background..."
-                    />
-                    <EnhanceButton
-                      text={resumeData.summary}
-                      onEnhanced={(text) => updateField("summary", text)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </SectionAccordion>
+          <div className="flex-1 overflow-y-auto">
+            <ActionRow
+              icon={PlusCircle}
+              label="Add Section"
+              onClick={() => setShowAddSectionModal(true)}
+              iconColorClass="bg-blue-100 text-blue-600"
+            />
 
-            {/* Experience Section */}
-            <SectionAccordion
-              title="Work Experience"
-              icon={Briefcase}
-              isOpen={activeSection === "experience"}
-              onToggle={() => setActiveSection(activeSection === "experience" ? null : "experience")}
-            >
-              <div className="space-y-4">
-                {resumeData.experience.map((exp, index) => (
-                  <ExperienceCard key={index} index={index} />
-                ))}
-                <button
-                  onClick={addExperience}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-dashed border-gray-200 text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors dark:border-gray-700"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Experience
-                </button>
-              </div>
-            </SectionAccordion>
+            <ActionRow
+              icon={Layout}
+              label="Templates"
+              onClick={() => toggleDrawer("templates")}
+              isActive={activeDrawer === "templates"}
+              iconColorClass="bg-orange-100 text-orange-600"
+            />
 
-            {/* Education Section */}
-            <SectionAccordion
-              title="Education"
-              icon={GraduationCap}
-              isOpen={activeSection === "education"}
-              onToggle={() => setActiveSection(activeSection === "education" ? null : "education")}
-            >
-              <div className="space-y-4">
-                {resumeData.education.map((edu, index) => (
-                  <EducationCard key={index} index={index} />
-                ))}
-                <button
-                  onClick={addEducation}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-dashed border-gray-200 text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors dark:border-gray-700"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Education
-                </button>
-              </div>
-            </SectionAccordion>
+            <ActionRow
+              icon={Palette}
+              label="Design & Fonts"
+              onClick={() => toggleDrawer("design")}
+              isActive={activeDrawer === "design"}
+              iconColorClass="bg-pink-100 text-pink-600"
+            />
 
-            {/* Skills Section */}
-            <SectionAccordion
-              title="Skills"
-              icon={Code}
-              isOpen={activeSection === "skills"}
-              onToggle={() => setActiveSection(activeSection === "skills" ? null : "skills")}
+            <ActionRow
+              icon={Eye}
+              label="Preview"
+              onClick={() => setShowPreviewModal(true)}
+              iconColorClass="bg-sky-100 text-sky-600"
+            />
+
+            <ActionRow
+              icon={History}
+              label="History"
+              onClick={() => toggleDrawer("history")}
+              isActive={activeDrawer === "history"}
+              iconColorClass="bg-violet-100 text-violet-600"
+            />
+
+            <ActionRow
+              icon={Share2}
+              label="Share"
+              onClick={() => { }}
+              iconColorClass="bg-green-100 text-green-600"
+            />
+
+            <ActionRow
+              icon={Download}
+              label="Export"
+              onClick={() => { }}
+              iconColorClass="bg-red-100 text-red-600"
+            />
+
+            <ActionRow
+              icon={FileText}
+              label="Cover Letter"
+              onClick={() => { }}
+              iconColorClass="bg-indigo-100 text-indigo-600"
+            />
+          </div>
+        </div>
+
+        {/* Add Section Modal */}
+        <AddSectionModal
+          isOpen={showAddSectionModal}
+          onClose={() => setShowAddSectionModal(false)}
+        />
+
+        {/* Drawer Panel (Push Layout) */}
+        <AnimatePresence mode="wait">
+          {activeDrawer && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 288, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="border-r bg-white dark:bg-gray-950 dark:border-gray-800 overflow-hidden flex flex-col z-0"
             >
-              <div className="space-y-4">
-                <div className="flex flex-wrap gap-2">
-                  {resumeData.skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm dark:bg-blue-900/30 dark:text-blue-400"
-                    >
-                      {skill.name}
-                      <button className="hover:text-blue-900 dark:hover:text-blue-300">
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Add a skill..."
-                    className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all dark:bg-gray-900 dark:border-gray-700"
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter" && e.currentTarget.value) {
-                        addSkill();
-                        e.currentTarget.value = "";
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={addSkill}
-                    className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
-                  >
-                    Add
+              <div className="w-72 h-full flex flex-col">
+                <div className="p-4 border-b flex items-center justify-between dark:border-gray-800 shrink-0">
+                  <h3 className="font-bold text-lg capitalize">{activeDrawer}</h3>
+                  <button onClick={() => setActiveDrawer(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors dark:hover:bg-gray-800">
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-2">Suggested skills:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {sampleSkills.map((skill) => (
-                      <button
-                        key={skill}
-                        className="px-2 py-1 rounded-md bg-gray-100 text-gray-600 text-xs hover:bg-gray-200 transition-colors dark:bg-gray-800 dark:text-gray-400"
-                      >
-                        + {skill}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </SectionAccordion>
-          </div>
-        </div>
 
-        {/* Right Panel - Preview */}
-        <div className="flex-1 overflow-y-auto p-8 bg-gray-100 dark:bg-gray-900">
-          <div className="mx-auto max-w-[210mm]">
-            <ResumePreview templateId={selectedTemplate} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SectionAccordion({ 
-  title, 
-  icon: Icon, 
-  isOpen, 
-  onToggle, 
-  children 
-}: { 
-  title: string; 
-  icon: any; 
-  isOpen: boolean; 
-  onToggle: () => void; 
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-            <Icon className="w-4 h-4 text-blue-600" />
-          </div>
-          <span className="font-medium">{title}</span>
-        </div>
-        {isOpen ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
-      </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="px-4 pb-4">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function InputField({ 
-  label, 
-  icon: Icon, 
-  value, 
-  onChange, 
-  placeholder,
-  type = "text"
-}: {
-  label: string;
-  icon: any;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-  type?: string;
-}) {
-  return (
-    <div>
-      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
-        {label}
-      </label>
-      <div className="relative">
-        <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input
-          type={type}
-          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all dark:bg-gray-900 dark:border-gray-700"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-        />
-      </div>
-    </div>
-  );
-}
-
-function ExperienceCard({ index }: { index: number }) {
-  const { resumeData, updateField } = useResumeStore();
-  const exp = resumeData.experience[index];
-
-  const updateExperience = (field: string, value: string) => {
-    const newExp = [...resumeData.experience];
-    newExp[index] = { ...newExp[index], [field]: value };
-    updateField("experience", newExp);
-  };
-
-  return (
-    <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 space-y-3">
-      <div className="flex items-center gap-2">
-        <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
-        <input
-          type="text"
-          className="flex-1 font-medium bg-transparent border-none outline-none text-sm"
-          placeholder="Job Title"
-          value={exp.position}
-          onChange={(e) => updateExperience("position", e.target.value)}
-        />
-        <button className="text-gray-400 hover:text-red-500 transition-colors">
-          <Trash2 className="w-4 h-4" />
-        </button>
-      </div>
-      <input
-        type="text"
-        className="w-full text-sm text-gray-600 bg-transparent border-none outline-none dark:text-gray-400"
-        placeholder="Company Name"
-        value={exp.company}
-        onChange={(e) => updateExperience("company", e.target.value)}
-      />
-      <div className="flex gap-2">
-        <input
-          type="text"
-          className="flex-1 text-xs text-gray-500 bg-transparent border-none outline-none"
-          placeholder="Start Date"
-          value={exp.start_date}
-          onChange={(e) => updateExperience("start_date", e.target.value)}
-        />
-        <span className="text-gray-400">-</span>
-        <input
-          type="text"
-          className="flex-1 text-xs text-gray-500 bg-transparent border-none outline-none"
-          placeholder="End Date"
-          value={exp.end_date}
-          onChange={(e) => updateExperience("end_date", e.target.value)}
-        />
-      </div>
-      <div className="relative">
-        <textarea
-          className="w-full text-sm rounded-lg border border-gray-200 p-2 min-h-[60px] focus:border-blue-500 outline-none dark:bg-gray-900 dark:border-gray-700"
-          placeholder="Describe your responsibilities..."
-          value={exp.description}
-          onChange={(e) => updateExperience("description", e.target.value)}
-        />
-        <EnhanceButton
-          text={exp.description}
-          onEnhanced={(text) => updateExperience("description", text)}
-          small
-        />
-      </div>
-    </div>
-  );
-}
-
-function EducationCard({ index }: { index: number }) {
-  const { resumeData, updateField } = useResumeStore();
-  const edu = resumeData.education[index];
-
-  const updateEducation = (field: string, value: string) => {
-    const newEdu = [...resumeData.education];
-    newEdu[index] = { ...newEdu[index], [field]: value };
-    updateField("education", newEdu);
-  };
-
-  return (
-    <div className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 space-y-3">
-      <div className="flex items-center gap-2">
-        <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
-        <input
-          type="text"
-          className="flex-1 font-medium bg-transparent border-none outline-none text-sm"
-          placeholder="Degree"
-          value={edu.degree}
-          onChange={(e) => updateEducation("degree", e.target.value)}
-        />
-        <button className="text-gray-400 hover:text-red-500 transition-colors">
-          <Trash2 className="w-4 h-4" />
-        </button>
-      </div>
-      <input
-        type="text"
-        className="w-full text-sm text-gray-600 bg-transparent border-none outline-none dark:text-gray-400"
-        placeholder="Institution Name"
-        value={edu.institution}
-        onChange={(e) => updateEducation("institution", e.target.value)}
-      />
-      <div className="flex gap-2">
-        <input
-          type="text"
-          className="flex-1 text-xs text-gray-500 bg-transparent border-none outline-none"
-          placeholder="Start Date"
-          value={edu.start_date}
-          onChange={(e) => updateEducation("start_date", e.target.value)}
-        />
-        <span className="text-gray-400">-</span>
-        <input
-          type="text"
-          className="flex-1 text-xs text-gray-500 bg-transparent border-none outline-none"
-          placeholder="End Date"
-          value={edu.end_date}
-          onChange={(e) => updateEducation("end_date", e.target.value)}
-        />
-      </div>
-    </div>
-  );
-}
-
-function EnhanceButton({ text, onEnhanced, small = false }: { text: string; onEnhanced: (t: string) => void; small?: boolean }) {
-  const [loading, setLoading] = useState(false);
-
-  const handleEnhance = async () => {
-    if (!text) return;
-    setLoading(true);
-    
-    setTimeout(() => {
-      const enhanced = text + " (Enhanced with AI suggestions for better impact and clarity.)";
-      onEnhanced(enhanced);
-      setLoading(false);
-    }, 1500);
-  };
-
-  return (
-    <button
-      onClick={handleEnhance}
-      disabled={loading || !text}
-      className={`absolute right-2 flex items-center gap-1 text-purple-600 hover:text-purple-700 disabled:opacity-50 transition-colors ${
-        small ? "bottom-2 text-xs" : "top-2 text-xs"
-      }`}
-    >
-      <Sparkles className={small ? "w-3 h-3" : "w-3.5 h-3.5"} />
-      {loading ? "Enhancing..." : "Enhance"}
-    </button>
-  );
-}
-
-function ResumePreview({ templateId }: { templateId: number }) {
-  const { resumeData } = useResumeStore();
-
-  const templateColors: Record<number, { primary: string; accent: string }> = {
-    1: { primary: "blue-600", accent: "blue-100" },
-    2: { primary: "gray-800", accent: "gray-100" },
-    3: { primary: "purple-600", accent: "purple-100" },
-    4: { primary: "slate-700", accent: "slate-100" },
-    5: { primary: "emerald-600", accent: "emerald-100" },
-  };
-
-  const colors = templateColors[templateId] || templateColors[1];
-
-  return (
-    <div className="bg-white shadow-2xl rounded-lg overflow-hidden print:shadow-none">
-      {/* Header */}
-      <div className={`bg-${colors.primary} text-white p-8`}>
-        <h1 className="text-3xl font-bold mb-2">
-          {resumeData.name || "Your Name"}
-        </h1>
-        <div className="flex flex-wrap gap-4 text-sm opacity-90">
-          {resumeData.email && (
-            <span className="flex items-center gap-1">
-              <Mail className="w-4 h-4" />
-              {resumeData.email}
-            </span>
-          )}
-          {resumeData.phone && (
-            <span className="flex items-center gap-1">
-              <Phone className="w-4 h-4" />
-              {resumeData.phone}
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="p-8 space-y-6">
-        {/* Summary */}
-        {resumeData.summary && (
-          <section>
-            <h2 className={`text-lg font-bold text-${colors.primary} border-b-2 border-${colors.accent} pb-2 mb-3`}>
-              Professional Summary
-            </h2>
-            <p className="text-gray-600 text-sm leading-relaxed">{resumeData.summary}</p>
-          </section>
-        )}
-
-        {/* Experience */}
-        {resumeData.experience.length > 0 && (
-          <section>
-            <h2 className={`text-lg font-bold text-${colors.primary} border-b-2 border-${colors.accent} pb-2 mb-3`}>
-              Work Experience
-            </h2>
-            <div className="space-y-4">
-              {resumeData.experience.map((exp, index) => (
-                <div key={index}>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold">{exp.position || "Position"}</h3>
-                      <p className="text-gray-600 text-sm">{exp.company || "Company"}</p>
+                <div className="flex-1 overflow-y-auto p-4">
+                  {activeDrawer === "templates" && (
+                    <div className="grid grid-cols-1 gap-4">
+                      {templates.map((template) => (
+                        <button
+                          key={template.id}
+                          onClick={() => setSelectedTemplate(template)}
+                          className={`group relative aspect-[210/297] w-full overflow-hidden rounded-lg border-2 transition-all ${selectedTemplate?.id === template.id
+                            ? "border-blue-600 ring-2 ring-blue-600/20"
+                            : "border-gray-200 hover:border-blue-400 dark:border-gray-800"
+                            }`}
+                        >
+                          <div className="absolute inset-0 bg-gray-100 dark:bg-gray-900 flex items-center justify-center text-gray-400">
+                            <Layout className="w-8 h-8" />
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 bg-white/90 p-2 text-xs font-medium dark:bg-gray-900/90 text-left">
+                            {template.name}
+                          </div>
+                          {selectedTemplate?.id === template.id && (
+                            <div className="absolute top-2 right-2 bg-blue-600 text-white p-1 rounded-full">
+                              <Check className="w-3 h-3" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
                     </div>
-                    <span className="text-xs text-gray-500">
-                      {exp.start_date} - {exp.end_date || "Present"}
-                    </span>
-                  </div>
-                  {exp.description && (
-                    <p className="text-sm text-gray-600 mt-2">{exp.description}</p>
+                  )}
+
+                  {activeDrawer === "design" && (
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="font-medium mb-3 text-sm text-gray-500 uppercase tracking-wider">Typography</h4>
+                        <div className="relative">
+                          <button
+                            onClick={() => setIsFontDropdownOpen(!isFontDropdownOpen)}
+                            className="w-full px-4 py-3 text-left rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between hover:border-blue-500 transition-colors"
+                          >
+                            <span className="text-gray-900 dark:text-gray-100 font-medium">
+                              {[
+                                { name: "Inter", value: "inter" },
+                                { name: "Roboto", value: "roboto" },
+                                { name: "Open Sans", value: "open-sans" },
+                                { name: "Lato", value: "lato" },
+                                { name: "Montserrat", value: "montserrat" },
+                                { name: "Merriweather", value: "merriweather" },
+                                { name: "Playfair Display", value: "playfair" },
+                                { name: "Lora", value: "lora" },
+                                { name: "Roboto Mono", value: "roboto-mono" }
+                              ].find(f => f.value === design.theme?.font)?.name || "Inter"}
+                            </span>
+                            <ChevronRight className={`w-4 h-4 text-gray-500 transition-transform ${isFontDropdownOpen ? "rotate-90" : ""}`} />
+                          </button>
+
+                          {isFontDropdownOpen && (
+                            <div className="absolute w-full mt-2 space-y-1 border border-gray-100 dark:border-gray-800 rounded-xl p-1 bg-white dark:bg-gray-900 shadow-lg z-10">
+                              {[
+                                { name: "Inter", value: "inter" },
+                                { name: "Roboto", value: "roboto" },
+                                { name: "Open Sans", value: "open-sans" },
+                                { name: "Lato", value: "lato" },
+                                { name: "Montserrat", value: "montserrat" },
+                                { name: "Merriweather", value: "merriweather" },
+                                { name: "Playfair Display", value: "playfair" },
+                                { name: "Lora", value: "lora" },
+                                { name: "Roboto Mono", value: "roboto-mono" }
+                              ].map((font) => (
+                                <button
+                                  key={font.value}
+                                  onClick={() => {
+                                    setDesign({ ...design, theme: { ...design.theme, font: font.value } });
+                                    setIsFontDropdownOpen(false);
+                                  }}
+                                  className={`w-full px-3 py-2 text-left rounded-lg transition-all flex items-center justify-between ${design.theme?.font === font.value
+                                    ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                    }`}
+                                  style={{ fontFamily: `var(--font-${font.value})` }}
+                                >
+                                  <span className="text-sm">{font.name}</span>
+                                  {design.theme?.font === font.value && <Check className="w-3 h-3" />}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="font-medium mb-3 text-sm text-gray-500 uppercase tracking-wider">Accent Color</h4>
+                        <div className="grid grid-cols-5 gap-3">
+                          {["blue-600", "purple-600", "green-600", "red-600", "gray-900"].map((color) => (
+                            <button
+                              key={color}
+                              onClick={() => setDesign({ ...design, theme: { ...design.theme, primary: color } })}
+                              className={`w-10 h-10 rounded-full border-2 transition-all ${design.theme?.primary === color
+                                ? "border-gray-900 scale-110 ring-2 ring-gray-200 dark:border-white dark:ring-gray-700"
+                                : "border-transparent hover:scale-105"
+                                }`}
+                            >
+                              <div className={`w-full h-full rounded-full bg-${color}`} />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeDrawer === "history" && (
+                    <div className="text-center text-gray-500 py-8">
+                      <History className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                      <p>Version history coming soon</p>
+                    </div>
                   )}
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Education */}
-        {resumeData.education.length > 0 && (
-          <section>
-            <h2 className={`text-lg font-bold text-${colors.primary} border-b-2 border-${colors.accent} pb-2 mb-3`}>
-              Education
-            </h2>
-            <div className="space-y-3">
-              {resumeData.education.map((edu, index) => (
-                <div key={index} className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold">{edu.degree || "Degree"}</h3>
-                    <p className="text-gray-600 text-sm">{edu.institution || "Institution"}</p>
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    {edu.start_date} - {edu.end_date}
-                  </span>
+        {/* Right Panel - Preview */}
+        <div
+          className="flex-1 bg-gray-100 overflow-y-auto p-8 flex justify-center dark:bg-gray-900 transition-all duration-300"
+          onClick={() => activeDrawer && setActiveDrawer(null)}
+        >
+          {selectedTemplate ? (
+            <div className="w-full max-w-[210mm] min-h-[297mm] origin-top scale-[0.85] lg:scale-100 transition-transform shadow-2xl">
+              <DynamicResumeRenderer template={selectedTemplate} />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              Loading template...
+            </div>
+          )}
+        </div>
+
+        {/* Preview Modal (Full Screen) */}
+        {showPreviewModal && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-8">
+            <button
+              onClick={() => setShowPreviewModal(false)}
+              className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="h-full overflow-y-auto w-full flex justify-center">
+              {selectedTemplate && (
+                <div className="bg-white shadow-2xl min-h-[297mm] w-[210mm]">
+                  <DynamicResumeRenderer template={selectedTemplate} />
                 </div>
-              ))}
+              )}
             </div>
-          </section>
-        )}
-
-        {/* Skills */}
-        {resumeData.skills.length > 0 && (
-          <section>
-            <h2 className={`text-lg font-bold text-${colors.primary} border-b-2 border-${colors.accent} pb-2 mb-3`}>
-              Skills
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {resumeData.skills.map((skill, index) => (
-                <span
-                  key={index}
-                  className={`px-3 py-1 rounded-full bg-${colors.accent} text-${colors.primary} text-sm`}
-                >
-                  {skill.name}
-                </span>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Empty State */}
-        {!resumeData.name && !resumeData.summary && resumeData.experience.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
-            <Eye className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium mb-2">Start filling in your details</p>
-            <p className="text-sm">Your resume preview will appear here</p>
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+export default function EditorPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading editor...</div>}>
+      <EditorContent />
+    </Suspense>
   );
 }
