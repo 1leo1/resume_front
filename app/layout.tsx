@@ -30,6 +30,11 @@ const robotoMono = Roboto_Mono({ variable: "--font-roboto-mono", subsets: ["lati
 export const metadata: Metadata = {
   title: "ClayCV - AI Resume Builder",
   description: "Build your professional resume with ClayCV.",
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
 };
 
 import { Providers } from "./providers";

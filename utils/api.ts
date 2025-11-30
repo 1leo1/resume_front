@@ -50,7 +50,15 @@ export const api = {
     get: async (endpoint: string) => {
         const headers = await getHeaders();
         const res = await fetch(`${API_URL}${endpoint}`, { headers });
-        if (!res.ok) throw new Error(await res.text());
+        if (!res.ok) {
+            const text = await res.text();
+            try {
+                const json = JSON.parse(text);
+                throw new Error(json.detail || json.message || text);
+            } catch (e) {
+                throw new Error(text || res.statusText);
+            }
+        }
         return res.json();
     },
     post: async (endpoint: string, body: any) => {
@@ -60,7 +68,15 @@ export const api = {
             headers,
             body: JSON.stringify(body)
         });
-        if (!res.ok) throw new Error(await res.text());
+        if (!res.ok) {
+            const text = await res.text();
+            try {
+                const json = JSON.parse(text);
+                throw new Error(json.detail || json.message || text);
+            } catch (e) {
+                throw new Error(text || res.statusText);
+            }
+        }
         return res.json();
     },
     patch: async (endpoint: string, body: any) => {
@@ -70,7 +86,15 @@ export const api = {
             headers,
             body: JSON.stringify(body)
         });
-        if (!res.ok) throw new Error(await res.text());
+        if (!res.ok) {
+            const text = await res.text();
+            try {
+                const json = JSON.parse(text);
+                throw new Error(json.detail || json.message || text);
+            } catch (e) {
+                throw new Error(text || res.statusText);
+            }
+        }
         return res.json();
     },
     put: async (endpoint: string, body: any) => {
@@ -80,7 +104,15 @@ export const api = {
             headers,
             body: JSON.stringify(body)
         });
-        if (!res.ok) throw new Error(await res.text());
+        if (!res.ok) {
+            const text = await res.text();
+            try {
+                const json = JSON.parse(text);
+                throw new Error(json.detail || json.message || text);
+            } catch (e) {
+                throw new Error(text || res.statusText);
+            }
+        }
         return res.json();
     }
 };

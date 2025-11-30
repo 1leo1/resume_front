@@ -49,7 +49,12 @@ function EditorContent() {
 
         const savedId = localStorage.getItem("active_resume_id");
 
-        if (savedId) {
+        // Check for query params to see if we should start fresh with placeholders
+        const industry = searchParams.get("industry");
+        const experience = searchParams.get("experience");
+        const shouldLoadPlaceholder = industry || experience;
+
+        if (savedId && !shouldLoadPlaceholder) {
           try {
             const resume = await api.get(`/resumes/${savedId}`);
             setResumeData(resume.content);
@@ -63,10 +68,18 @@ function EditorContent() {
           }
         }
 
+        // Determine initial content
+        let initialContent = resumeData;
+        if (shouldLoadPlaceholder) {
+          const { getPlaceholderData } = await import("@/utils/placeholders");
+          initialContent = getPlaceholderData(industry || "", experience || "");
+          setResumeData(initialContent);
+        }
+
         // Create new resume if none found or load failed
         const newResume = await api.post("/resumes", {
           title: "My Resume",
-          content: resumeData, // Use initial store data (dummy or empty)
+          content: initialContent,
           design: design
         });
 
