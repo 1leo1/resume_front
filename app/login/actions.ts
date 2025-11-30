@@ -60,7 +60,7 @@ export async function signInWithOAuth(provider: 'google' | 'github' | 'linkedin'
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-            redirectTo: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/callback`,
+            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:5000'}/auth/callback`,
         },
     })
 
