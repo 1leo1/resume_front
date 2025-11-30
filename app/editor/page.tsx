@@ -54,7 +54,7 @@ function EditorContent() {
         const experience = searchParams.get("experience");
         const shouldLoadPlaceholder = industry || experience;
 
-        if (savedId && !shouldLoadPlaceholder) {
+        if (savedId) {
           try {
             const resume = await api.get(`/resumes/${savedId}`);
             setResumeData(resume.content);

@@ -29,6 +29,7 @@ export function useAutoSave() {
                     content: resumeData,
                     design: design
                 });
+                console.log("Auto-save successful");
                 setLastSaved(new Date());
             } catch (error) {
                 console.error("Auto-save failed:", error);
