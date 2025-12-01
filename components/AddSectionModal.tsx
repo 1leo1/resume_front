@@ -1,4 +1,4 @@
-import { X, Plus, Briefcase, GraduationCap, Globe, FolderGit2, Award, Heart, BookOpen, Users, PlusCircle } from "lucide-react";
+import { X, Plus, Briefcase, GraduationCap, Globe, FolderGit2, Award, Heart, BookOpen, Users, PlusCircle, User, FileText } from "lucide-react";
 import { useResumeStore } from "@/store/useResumeStore";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -9,6 +9,8 @@ interface AddSectionModalProps {
 }
 
 const SECTION_IMAGES: Record<string, string> = {
+    header: "/section-icons/work.png", // Fallback
+    summary: "/section-icons/work.png", // Fallback
     work: "/section-icons/work.png",
     education: "/section-icons/education.png",
     skills: "/section-icons/skills.png",
@@ -20,6 +22,8 @@ const SECTION_IMAGES: Record<string, string> = {
 };
 
 const AVAILABLE_SECTIONS = [
+    { id: "header", label: "Personal Info", icon: User, description: "Name, title, contact" },
+    { id: "summary", label: "Summary", icon: FileText, description: "Professional summary" },
     { id: "work", label: "Experience", icon: Briefcase, description: "Work history" },
     { id: "education", label: "Education", icon: GraduationCap, description: "Degrees" },
     { id: "skills", label: "Skills", icon: BookOpen, description: "Competencies" },

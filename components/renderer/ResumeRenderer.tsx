@@ -44,14 +44,13 @@ function SortableSection({ id, children, isInteractive, isFocused }: { id: strin
     if (!isInteractive) return <div className="mb-6" data-section-id={id}>{children}</div>;
 
     return (
-        <div 
-            ref={setNodeRef} 
-            style={style} 
-            className={`group relative mb-6 transition-all duration-300 rounded-lg ${
-                isFocused 
-                    ? 'ring-2 ring-blue-500 ring-offset-2 bg-blue-50/50' 
-                    : ''
-            }`}
+        <div
+            ref={setNodeRef}
+            style={style}
+            className={`group relative mb-6 transition-all duration-300 rounded-lg ${isFocused
+                ? 'ring-2 ring-blue-500 ring-offset-2 bg-blue-50/50'
+                : ''
+                }`}
             data-section-id={id}
         >
             {isInteractive && (
@@ -144,7 +143,16 @@ export default function ResumeRenderer({ content, structure, styles, sectionConf
                             >
                                 <SortableContext items={sortedSections} strategy={verticalListSortingStrategy}>
                                     {sortedSections.map((sectionId) => {
-                                        if (sectionConfig?.hidden?.includes(sectionId)) {
+                                        // Handle aliases for visibility
+                                        const lowerId = sectionId.toLowerCase();
+                                        let checkId = sectionId;
+                                        if (lowerId === 'contact') checkId = 'header';
+                                        if (lowerId === 'experience') checkId = 'work';
+
+                                        // Debugging visibility
+                                        // console.log(`Checking visibility for ${sectionId} (checkId: ${checkId})`, sectionConfig?.hidden);
+
+                                        if (sectionConfig?.hidden?.includes(checkId) || sectionConfig?.hidden?.includes(lowerId)) {
                                             return null;
                                         }
 
@@ -164,9 +172,9 @@ export default function ResumeRenderer({ content, structure, styles, sectionConf
                                         }
 
                                         return (
-                                            <SortableSection 
-                                                key={sectionId} 
-                                                id={sectionId} 
+                                            <SortableSection
+                                                key={sectionId}
+                                                id={sectionId}
                                                 isInteractive={isInteractive}
                                                 isFocused={focusedSection === sectionId}
                                             >

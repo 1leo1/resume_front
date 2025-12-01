@@ -6,10 +6,10 @@ import { useSearchParams } from "next/navigation";
 import { useResumeStore } from "@/store/useResumeStore";
 import {
   Download, Palette, FileText, Layout, Briefcase,
-  Eye, History, ChevronRight, X, Check, PlusCircle, 
+  Eye, History, ChevronRight, X, Check, PlusCircle,
   Loader2, ZoomIn, ZoomOut, Cloud, CloudOff,
-  ChevronLeft, Printer, User, GraduationCap, Code, Globe, 
-  FolderGit2, Award, Heart, BookOpen, ChevronDown
+  ChevronLeft, Printer, User, GraduationCap, Code, Globe,
+  FolderGit2, Award, Heart, BookOpen, ChevronDown, Trash2
 } from "lucide-react";
 import Link from "next/link";
 import ResumeRenderer from "@/components/renderer/ResumeRenderer";
@@ -174,7 +174,8 @@ function EditorContent() {
     toggleSectionVisibility,
     renameSection,
     focusedSection,
-    setFocusedSection
+    setFocusedSection,
+    removeSection
   } = useResumeStore();
 
   const searchParams = useSearchParams();
@@ -287,7 +288,7 @@ function EditorContent() {
 
   const handleSectionClick = (sectionId: string) => {
     setFocusedSection(sectionId);
-    
+
     setTimeout(() => {
       const sectionElement = document.querySelector(`[data-section-id="${sectionId}"]`);
       if (sectionElement && resumeContainerRef.current) {
@@ -336,9 +337,9 @@ function EditorContent() {
               ClayCV
             </span>
           </Link>
-          
+
           <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1" />
-          
+
           <div className="flex items-center gap-2">
             <input
               type="text"
@@ -392,7 +393,7 @@ function EditorContent() {
             <Eye className="w-4 h-4" />
             Preview
           </button>
-          
+
           <button
             onClick={handlePrint}
             className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-lg shadow-sm shadow-blue-500/20 transition-all"
@@ -404,7 +405,7 @@ function EditorContent() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <motion.div 
+        <motion.div
           className="bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col shrink-0 z-20 overflow-hidden"
           animate={{ width: sidebarCollapsed ? 56 : 220 }}
           transition={{ duration: 0.2 }}
@@ -413,7 +414,7 @@ function EditorContent() {
             {!sidebarCollapsed && (
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Editor</span>
             )}
-            <button 
+            <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-gray-600"
             >
@@ -430,7 +431,7 @@ function EditorContent() {
               onClick={() => toggleDrawer("design")}
               isActive={activeDrawer === "design"}
             />
-            
+
             <SidebarItem
               icon={PlusCircle}
               label="Add Section"
@@ -464,8 +465,8 @@ function EditorContent() {
                 >
                   {SECTION_CONFIG.map((section) => {
                     const isActive = isSectionActive(section.id);
-                    if (!isActive && section.id !== 'header' && section.id !== 'summary') return null;
-                    
+                    if (!isActive) return null;
+
                     return (
                       <ContentSectionItem
                         key={section.id}
@@ -474,6 +475,7 @@ function EditorContent() {
                         collapsed={sidebarCollapsed}
                         onClick={() => handleSectionClick(section.id)}
                         isFocused={focusedSection === section.id}
+                        onDelete={() => removeSection(section.id)}
                       />
                     );
                   })}
@@ -507,8 +509,8 @@ function EditorContent() {
               <div className="w-[300px] h-full flex flex-col">
                 <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
                   <h3 className="font-semibold text-gray-900 dark:text-white capitalize">{activeDrawer}</h3>
-                  <button 
-                    onClick={() => setActiveDrawer(null)} 
+                  <button
+                    onClick={() => setActiveDrawer(null)}
                     className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                   >
                     <X className="w-4 h-4 text-gray-500" />
@@ -541,11 +543,10 @@ function EditorContent() {
                           <button
                             key={template.id}
                             onClick={() => handleTemplateSelect(template)}
-                            className={`group relative aspect-[210/297] w-full overflow-hidden rounded-xl border-2 transition-all ${
-                              selectedTemplate?.id === template.id
-                                ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg"
-                                : "border-gray-200 hover:border-blue-300 dark:border-gray-700 hover:shadow-md"
-                            }`}
+                            className={`group relative aspect-[210/297] w-full overflow-hidden rounded-xl border-2 transition-all ${selectedTemplate?.id === template.id
+                              ? "border-blue-500 ring-2 ring-blue-500/20 shadow-lg"
+                              : "border-gray-200 hover:border-blue-300 dark:border-gray-700 hover:shadow-md"
+                              }`}
                           >
                             <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
                               <Layout className="w-8 h-8 text-gray-300 dark:text-gray-600" />
@@ -573,17 +574,16 @@ function EditorContent() {
                             <button
                               key={color.value}
                               onClick={() => setDesign({ ...design, theme: { ...design.theme, primary: color.value } })}
-                              className={`w-10 h-10 rounded-xl ${color.class} transition-all hover:scale-110 ${
-                                design.theme.primary === color.value 
-                                  ? 'ring-2 ring-offset-2 ring-gray-900 dark:ring-white scale-110' 
-                                  : ''
-                              }`}
+                              className={`w-10 h-10 rounded-xl ${color.class} transition-all hover:scale-110 ${design.theme.primary === color.value
+                                ? 'ring-2 ring-offset-2 ring-gray-900 dark:ring-white scale-110'
+                                : ''
+                                }`}
                               title={color.name}
                             />
                           ))}
                         </div>
                       </div>
-                      
+
                       <div>
                         <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Font Style</h4>
                         <div className="space-y-2">
@@ -591,11 +591,10 @@ function EditorContent() {
                             <button
                               key={font.value}
                               onClick={() => setDesign({ ...design, theme: { ...design.theme, font: font.value } })}
-                              className={`w-full p-3 text-left rounded-xl border-2 transition-all ${
-                                design.theme.font === font.value
-                                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
-                              }`}
+                              className={`w-full p-3 text-left rounded-xl border-2 transition-all ${design.theme.font === font.value
+                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                                }`}
                             >
                               <div className="font-medium text-gray-900 dark:text-white">{font.name}</div>
                               <div className="text-xs text-gray-500 mt-0.5">{font.sample}</div>
@@ -609,11 +608,10 @@ function EditorContent() {
                         <div className="grid grid-cols-2 gap-2">
                           <button
                             onClick={() => setDesign({ ...design, layout: 'single-column' })}
-                            className={`p-3 rounded-xl border-2 transition-all ${
-                              design.layout === 'single-column'
-                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                : 'border-gray-200 dark:border-gray-700'
-                            }`}
+                            className={`p-3 rounded-xl border-2 transition-all ${design.layout === 'single-column'
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                              : 'border-gray-200 dark:border-gray-700'
+                              }`}
                           >
                             <div className="w-full aspect-[3/4] bg-gray-100 dark:bg-gray-700 rounded-lg flex flex-col gap-1 p-2">
                               <div className="h-2 bg-gray-300 dark:bg-gray-600 rounded" />
@@ -624,11 +622,10 @@ function EditorContent() {
                           </button>
                           <button
                             onClick={() => setDesign({ ...design, layout: 'two-column' })}
-                            className={`p-3 rounded-xl border-2 transition-all ${
-                              design.layout === 'two-column'
-                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                : 'border-gray-200 dark:border-gray-700'
-                            }`}
+                            className={`p-3 rounded-xl border-2 transition-all ${design.layout === 'two-column'
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                              : 'border-gray-200 dark:border-gray-700'
+                              }`}
                           >
                             <div className="w-full aspect-[3/4] bg-gray-100 dark:bg-gray-700 rounded-lg flex gap-1 p-2">
                               <div className="w-1/3 bg-gray-300 dark:bg-gray-600 rounded" />
@@ -660,7 +657,7 @@ function EditorContent() {
         </AnimatePresence>
 
         <div className="flex-1 bg-gray-200 dark:bg-gray-900 flex flex-col overflow-hidden">
-          <div 
+          <div
             ref={resumeContainerRef}
             className="flex-1 overflow-auto p-8 flex justify-center"
             onClick={() => {
@@ -669,7 +666,7 @@ function EditorContent() {
             }}
           >
             {selectedTemplate ? (
-              <div 
+              <div
                 className="origin-top transition-transform duration-200"
                 style={{ transform: `scale(${zoomLevel})` }}
               >
@@ -704,7 +701,7 @@ function EditorContent() {
 
         <AnimatePresence>
           {showPreviewModal && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -755,37 +752,35 @@ function EditorContent() {
   );
 }
 
-function SidebarItem({ 
-  icon: Icon, 
-  label, 
+function SidebarItem({
+  icon: Icon,
+  label,
   sublabel,
-  collapsed, 
-  onClick, 
+  collapsed,
+  onClick,
   isActive = false,
-}: { 
-  icon: any; 
+}: {
+  icon: any;
   label: string;
   sublabel?: string;
-  collapsed: boolean; 
+  collapsed: boolean;
   onClick: () => void;
   isActive?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-3 py-2 transition-all relative group ${
-        collapsed ? 'justify-center' : ''
-      } ${isActive ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+      className={`w-full flex items-center gap-3 px-3 py-2 transition-all relative group ${collapsed ? 'justify-center' : ''
+        } ${isActive ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
       title={collapsed ? label : undefined}
     >
       {isActive && (
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-8 bg-blue-600 rounded-r" />
       )}
-      <div className={`p-2 rounded-lg transition-colors ${
-        isActive 
-          ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400' 
-          : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-700'
-      }`}>
+      <div className={`p-2 rounded-lg transition-colors ${isActive
+        ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
+        : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-700'
+        }`}>
         <Icon className="w-4 h-4" />
       </div>
       {!collapsed && (
@@ -802,46 +797,61 @@ function SidebarItem({
   );
 }
 
-function ContentSectionItem({ 
-  icon: Icon, 
-  label, 
-  collapsed, 
+function ContentSectionItem({
+  icon: Icon,
+  label,
+  collapsed,
   onClick,
   isFocused = false,
-}: { 
-  icon: any; 
+  onDelete,
+}: {
+  icon: any;
   label: string;
-  collapsed: boolean; 
+  collapsed: boolean;
   onClick: () => void;
   isFocused?: boolean;
+  onDelete?: () => void;
 }) {
   return (
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center gap-3 px-3 py-1.5 transition-all relative group ${
-        collapsed ? 'justify-center' : ''
-      } ${isFocused ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
-      title={collapsed ? label : undefined}
-    >
-      {isFocused && (
-        <motion.div 
-          layoutId="section-indicator"
-          className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-blue-600 rounded-r" 
-        />
-      )}
-      <div className={`p-1.5 rounded-md transition-colors ${
-        isFocused 
-          ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400' 
+    <div className="group/item relative w-full">
+      <button
+        onClick={onClick}
+        className={`w-full flex items-center gap-3 px-3 py-1.5 transition-all relative group ${collapsed ? 'justify-center' : ''
+          } ${isFocused ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+        title={collapsed ? label : undefined}
+      >
+        {isFocused && (
+          <motion.div
+            layoutId="section-indicator"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-blue-600 rounded-r"
+          />
+        )}
+        <div className={`p-1.5 rounded-md transition-colors ${isFocused
+          ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
           : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
-      }`}>
-        <Icon className="w-4 h-4" />
-      </div>
-      {!collapsed && (
-        <span className={`text-sm ${isFocused ? 'text-blue-600 font-medium dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
-          {label}
-        </span>
+          }`}>
+          <Icon className="w-4 h-4" />
+        </div>
+        {!collapsed && (
+          <span className={`text-sm ${isFocused ? 'text-blue-600 font-medium dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
+            {label}
+          </span>
+        )}
+      </button>
+
+      {!collapsed && onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md opacity-0 group-hover/item:opacity-100 transition-all"
+          title="Remove section"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
       )}
-    </button>
+    </div>
   );
 }
 
