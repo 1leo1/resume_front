@@ -181,4 +181,9 @@ export interface Resume {
     title?: string;
     content: ResumeContent;
     design: ResumeDesign;
+    section_config?: {
+        order: string[];
+        hidden: string[];
+        titles: Record<string, string>;
+    };
 }

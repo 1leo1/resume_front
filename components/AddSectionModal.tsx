@@ -31,7 +31,12 @@ const AVAILABLE_SECTIONS = [
 ];
 
 export default function AddSectionModal({ isOpen, onClose }: AddSectionModalProps) {
-    const { activeSections, addSection } = useResumeStore();
+    const { sectionConfig, addSection } = useResumeStore();
+
+    // Helper to check if section is active (in order and not hidden)
+    const isSectionActive = (id: string) => {
+        return sectionConfig.order.includes(id) && !sectionConfig.hidden.includes(id);
+    };
 
     if (!isOpen) return null;
 
@@ -65,13 +70,13 @@ export default function AddSectionModal({ isOpen, onClose }: AddSectionModalProp
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[...AVAILABLE_SECTIONS]
                             .sort((a, b) => {
-                                const aAdded = activeSections.includes(a.id);
-                                const bAdded = activeSections.includes(b.id);
+                                const aAdded = isSectionActive(a.id);
+                                const bAdded = isSectionActive(b.id);
                                 if (aAdded === bAdded) return 0;
                                 return aAdded ? 1 : -1;
                             })
                             .map((section) => {
-                                const isAdded = activeSections.includes(section.id);
+                                const isAdded = isSectionActive(section.id);
                                 const Icon = section.icon;
 
                                 return (

@@ -25,11 +25,17 @@ interface ResumeStore {
     // Template Management
     setTemplate: (template: Template) => void;
 
-    // Dynamic Sections
-    activeSections: string[];
-    addSection: (sectionId: string) => void;
-    removeSection: (sectionId: string) => void;
+    // Section Configuration
+    sectionConfig: {
+        order: string[];
+        hidden: string[];
+        titles: Record<string, string>;
+    };
+    setSectionConfig: (config: any) => void;
+    toggleSectionVisibility: (sectionId: string) => void;
+    renameSection: (sectionId: string, title: string) => void;
     reorderSections: (newOrder: string[]) => void;
+    addSection: (sectionId: string) => void;
 
     // New Section Actions
     addLanguage: (language: Language) => void;
@@ -74,7 +80,11 @@ export const useResumeStore = create<ResumeStore>((set) => ({
     resumeData: initialContent,
     design: initialDesign,
     resumeId: null,
-    activeSections: ["work", "education", "skills"], // Default sections
+    sectionConfig: {
+        order: ["work", "education", "skills", "projects"],
+        hidden: [],
+        titles: {}
+    },
     setResumeData: (data) => set({ resumeData: data }),
     setDesign: (design) => set({ design }),
     setResumeId: (id) => set({ resumeId: id }),
@@ -87,23 +97,18 @@ export const useResumeStore = create<ResumeStore>((set) => ({
                 layout: template.structure.layout.type as "single-column" | "two-column",
             };
 
-            // 2. Re-align Active Sections
+            // 2. Update Section Config Order based on Template
             // Extract all sections from the new template's columns
             const templateSections = template.structure.layout.columns.flatMap(
                 (col: any) => col.sections
             );
 
-            // We want to keep the user's current active sections if they exist in the new template,
-            // OR if they are custom sections (not in the standard list).
-            // But for simplicity and "best fit", we can just adopt the new template's default sections
-            // and maybe append any non-standard ones the user had active?
-            // For now, let's strictly adopt the template's structure as the "active" view,
-            // because the user chose this template for its structure.
-            // Data is preserved in `resumeData`, so switching back restores it.
-
             return {
                 design: newDesign,
-                activeSections: templateSections,
+                sectionConfig: {
+                    ...state.sectionConfig,
+                    order: templateSections
+                }
             };
         }),
 
@@ -185,22 +190,57 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         })),
 
     // Section Management
-    addSection: (sectionId) =>
-        set((state) => ({
-            activeSections: state.activeSections.includes(sectionId)
-                ? state.activeSections
-                : [...state.activeSections, sectionId]
-        })),
+    // Section Management
+    setSectionConfig: (config) => set({ sectionConfig: config }),
 
-    removeSection: (sectionId) =>
+    toggleSectionVisibility: (sectionId) =>
+        set((state) => {
+            const isHidden = state.sectionConfig.hidden.includes(sectionId);
+            return {
+                sectionConfig: {
+                    ...state.sectionConfig,
+                    hidden: isHidden
+                        ? state.sectionConfig.hidden.filter(id => id !== sectionId)
+                        : [...state.sectionConfig.hidden, sectionId]
+                }
+            };
+        }),
+
+    renameSection: (sectionId, title) =>
         set((state) => ({
-            activeSections: state.activeSections.filter((id) => id !== sectionId)
+            sectionConfig: {
+                ...state.sectionConfig,
+                titles: {
+                    ...state.sectionConfig.titles,
+                    [sectionId]: title
+                }
+            }
         })),
 
     reorderSections: (newOrder) =>
-        set(() => ({
-            activeSections: newOrder
+        set((state) => ({
+            sectionConfig: {
+                ...state.sectionConfig,
+                order: newOrder
+            }
         })),
+
+    addSection: (sectionId: string) =>
+        set((state) => {
+            const currentOrder = state.sectionConfig.order;
+            const isAlreadyInOrder = currentOrder.includes(sectionId);
+
+            // If already in order, just ensure it's visible
+            // If not in order, append it and ensure visible
+
+            return {
+                sectionConfig: {
+                    ...state.sectionConfig,
+                    order: isAlreadyInOrder ? currentOrder : [...currentOrder, sectionId],
+                    hidden: state.sectionConfig.hidden.filter(id => id !== sectionId)
+                }
+            };
+        }),
 
     // New Section Implementations
     addLanguage: (language) =>
