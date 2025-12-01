@@ -17,12 +17,13 @@ interface Props {
         titles: Record<string, string>;
     };
     isInteractive?: boolean;
+    focusedSection?: string | null;
     onReorder?: (newOrder: string[]) => void;
     onEdit?: (sectionId: string) => void;
     onContentChange?: (sectionId: string, data: any) => void;
 }
 
-function SortableSection({ id, children, isInteractive }: { id: string, children: React.ReactNode, isInteractive?: boolean }) {
+function SortableSection({ id, children, isInteractive, isFocused }: { id: string, children: React.ReactNode, isInteractive?: boolean, isFocused?: boolean }) {
     const {
         attributes,
         listeners,
@@ -40,10 +41,19 @@ function SortableSection({ id, children, isInteractive }: { id: string, children
         zIndex: isDragging ? 100 : 1,
     };
 
-    if (!isInteractive) return <div className="mb-6">{children}</div>;
+    if (!isInteractive) return <div className="mb-6" data-section-id={id}>{children}</div>;
 
     return (
-        <div ref={setNodeRef} style={style} className="group relative mb-6">
+        <div 
+            ref={setNodeRef} 
+            style={style} 
+            className={`group relative mb-6 transition-all duration-300 rounded-lg ${
+                isFocused 
+                    ? 'ring-2 ring-blue-500 ring-offset-2 bg-blue-50/50' 
+                    : ''
+            }`}
+            data-section-id={id}
+        >
             {isInteractive && (
                 <div
                     {...attributes}
@@ -59,8 +69,7 @@ function SortableSection({ id, children, isInteractive }: { id: string, children
     );
 }
 
-export default function ResumeRenderer({ content, structure, styles, sectionConfig, isInteractive = false, onReorder, onEdit, onContentChange }: Props) {
-    // 1. Generate Dynamic CSS Variables
+export default function ResumeRenderer({ content, structure, styles, sectionConfig, isInteractive = false, focusedSection, onReorder, onEdit, onContentChange }: Props) {
     const cssVars = {
         '--primary-color': styles.primary,
         '--accent-color': styles.accent,
@@ -103,12 +112,9 @@ export default function ResumeRenderer({ content, structure, styles, sectionConf
                 <div className="resume-grid" style={{ display: 'flex', flexDirection: 'row', gap: '2rem' }}>
 
                     {structure.layout.columns.map((col, index) => {
-                        // 1. Identify sections belonging to this column from the structure
                         let columnSections = [...col.sections];
 
-                        // 2. If this is the main column (usually the wider one or the last one), append orphan sections
-                        // Orphan sections are those in sectionConfig.order but NOT in any column of the structure
-                        const isMainColumn = index === structure.layout.columns.length - 1; // Simple heuristic: last column is main or we dump there
+                        const isMainColumn = index === structure.layout.columns.length - 1;
 
                         if (isMainColumn && sectionConfig?.order) {
                             const allStructureSections = structure.layout.columns.flatMap(c => c.sections);
@@ -116,12 +122,10 @@ export default function ResumeRenderer({ content, structure, styles, sectionConf
                             columnSections = [...columnSections, ...orphanSections];
                         }
 
-                        // 3. Sort sections based on sectionConfig.order
                         const sortedSections = Array.from(new Set(columnSections)).sort((a, b) => {
                             if (!sectionConfig?.order) return 0;
                             const idxA = sectionConfig.order.indexOf(a);
                             const idxB = sectionConfig.order.indexOf(b);
-                            // If not found, keep original relative order (or push to end)
                             if (idxA === -1) return 1;
                             if (idxB === -1) return -1;
                             return idxA - idxB;
@@ -160,7 +164,12 @@ export default function ResumeRenderer({ content, structure, styles, sectionConf
                                         }
 
                                         return (
-                                            <SortableSection key={sectionId} id={sectionId} isInteractive={isInteractive}>
+                                            <SortableSection 
+                                                key={sectionId} 
+                                                id={sectionId} 
+                                                isInteractive={isInteractive}
+                                                isFocused={focusedSection === sectionId}
+                                            >
                                                 <SectionComponent
                                                     data={sectionData}
                                                     styles={{

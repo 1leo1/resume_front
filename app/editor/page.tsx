@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { useResumeStore } from "@/store/useResumeStore";
 import {
-  Download, Palette, Share2, FileText, Layout, Briefcase,
-  Undo2, Redo2, Eye, History, ChevronRight, X, Check, PlusCircle, 
-  Loader2, Save, ZoomIn, ZoomOut, Sparkles, Cloud, CloudOff,
-  Menu, ChevronLeft, Settings, Copy, ExternalLink, Printer
+  Download, Palette, FileText, Layout, Briefcase,
+  Eye, History, ChevronRight, X, Check, PlusCircle, 
+  Loader2, ZoomIn, ZoomOut, Cloud, CloudOff,
+  ChevronLeft, Printer, User, GraduationCap, Code, Globe, 
+  FolderGit2, Award, Heart, BookOpen, ChevronDown
 } from "lucide-react";
 import Link from "next/link";
 import ResumeRenderer from "@/components/renderer/ResumeRenderer";
@@ -86,22 +87,22 @@ const DEFAULT_RESUME_DATA = {
     email: "alex.chen@example.com",
     phone: "+1 (555) 123-4567",
     summary: "Full-stack developer with 5+ years of experience building scalable web applications. Passionate about clean code and user experience.",
-    location: { city: "San Francisco, CA" }
+    location: { city: "San Francisco" }
   },
   work: [
     {
-      name: "TechCorp Inc.",
+      name: "Company Name",
       position: "Senior Developer",
       startDate: "2021-03",
       endDate: "Present",
-      summary: "Leading the frontend team in migrating to Next.js. Improved page load times by 40% and implemented CI/CD pipelines."
+      summary: "Leading the frontend team in migrating to Next.js."
     },
     {
-      name: "StartupXYZ",
+      name: "Company Name",
       position: "Software Engineer",
       startDate: "2018-06",
       endDate: "2021-02",
-      summary: "Developed core features for the main product. Built RESTful APIs and integrated third-party services."
+      summary: "Developed core features for the main product."
     }
   ],
   education: [
@@ -115,23 +116,18 @@ const DEFAULT_RESUME_DATA = {
   ],
   skills: [
     { name: "JavaScript" },
-    { name: "TypeScript" },
     { name: "React" },
-    { name: "Next.js" },
-    { name: "Node.js" },
     { name: "Python" },
-    { name: "AWS" },
-    { name: "Docker" }
+    { name: "AWS" }
   ],
-  languages: [
-    { language: "English", fluency: "Native" },
-    { language: "Spanish", fluency: "Intermediate" }
-  ],
+  languages: [],
   projects: [
     {
-      name: "Open Source CLI Tool",
-      description: "Built a CLI tool for automating development workflows. 500+ GitHub stars.",
-      url: "github.com/alexchen/cli-tool"
+      name: "E-commerce Platform",
+      description: "Built a full-featured e-commerce site using MERN stack.",
+      url: "Project URL",
+      startDate: "Start",
+      endDate: "End"
     }
   ],
   awards: [],
@@ -140,14 +136,29 @@ const DEFAULT_RESUME_DATA = {
   publications: []
 };
 
+const SECTION_CONFIG = [
+  { id: "header", label: "Personal Info", icon: User, description: "Name, title, contact" },
+  { id: "summary", label: "Summary", icon: FileText, description: "Professional summary" },
+  { id: "work", label: "Experience", icon: Briefcase, description: "Work history" },
+  { id: "education", label: "Education", icon: GraduationCap, description: "Academic background" },
+  { id: "skills", label: "Skills", icon: Code, description: "Technical abilities" },
+  { id: "projects", label: "Projects", icon: FolderGit2, description: "Portfolio projects" },
+  { id: "languages", label: "Languages", icon: Globe, description: "Spoken languages" },
+  { id: "awards", label: "Awards", icon: Award, description: "Achievements" },
+  { id: "volunteer", label: "Volunteering", icon: Heart, description: "Community work" },
+];
+
 function EditorContent() {
   const [blueprints, setBlueprints] = useState<JobBlueprint[]>([]);
   const [selectedBlueprint, setSelectedBlueprint] = useState<JobBlueprint | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(0.75);
+  const [zoomLevel, setZoomLevel] = useState(0.85);
   const [documentName, setDocumentName] = useState("My Resume");
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [contentExpanded, setContentExpanded] = useState(true);
+
+  const resumeContainerRef = useRef<HTMLDivElement>(null);
 
   const {
     resumeData,
@@ -161,7 +172,9 @@ function EditorContent() {
     setSectionConfig,
     reorderSections,
     toggleSectionVisibility,
-    renameSection
+    renameSection,
+    focusedSection,
+    setFocusedSection
   } = useResumeStore();
 
   const searchParams = useSearchParams();
@@ -272,6 +285,25 @@ function EditorContent() {
     window.print();
   };
 
+  const handleSectionClick = (sectionId: string) => {
+    setFocusedSection(sectionId);
+    
+    setTimeout(() => {
+      const sectionElement = document.querySelector(`[data-section-id="${sectionId}"]`);
+      if (sectionElement && resumeContainerRef.current) {
+        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+
+    setTimeout(() => {
+      setFocusedSection(null);
+    }, 2000);
+  };
+
+  const isSectionActive = (sectionId: string) => {
+    return sectionConfig.order.includes(sectionId) && !sectionConfig.hidden.includes(sectionId);
+  };
+
   const colorOptions = [
     { name: 'Blue', value: '#2563eb', class: 'bg-blue-600' },
     { name: 'Indigo', value: '#4f46e5', class: 'bg-indigo-600' },
@@ -293,10 +325,8 @@ function EditorContent() {
   ];
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
-      {/* Modern Header */}
+    <div className="flex h-screen flex-col bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <header className="h-14 flex items-center justify-between px-4 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 shrink-0 z-30">
-        {/* Left Section */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -334,7 +364,26 @@ function EditorContent() {
           </div>
         </div>
 
-        {/* Right Section */}
+        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          <button
+            onClick={handleZoomOut}
+            className="p-1.5 hover:bg-white dark:hover:bg-gray-700 rounded transition-colors"
+            disabled={zoomLevel <= 0.5}
+          >
+            <ZoomOut className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          </button>
+          <span className="text-xs text-gray-600 dark:text-gray-400 w-10 text-center font-medium">
+            {Math.round(zoomLevel * 100)}%
+          </span>
+          <button
+            onClick={handleZoomIn}
+            className="p-1.5 hover:bg-white dark:hover:bg-gray-700 rounded transition-colors"
+            disabled={zoomLevel >= 1.5}
+          >
+            <ZoomIn className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          </button>
+        </div>
+
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowPreviewModal(true)}
@@ -355,103 +404,107 @@ function EditorContent() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar */}
         <motion.div 
-          className="bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col shrink-0 z-20"
-          animate={{ width: sidebarCollapsed ? 60 : 240 }}
+          className="bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col shrink-0 z-20 overflow-hidden"
+          animate={{ width: sidebarCollapsed ? 56 : 220 }}
           transition={{ duration: 0.2 }}
         >
-          {/* Sidebar Header */}
-          <div className={`p-4 border-b border-gray-100 dark:border-gray-800 flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
+          <div className={`p-3 border-b border-gray-100 dark:border-gray-800 flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
             {!sidebarCollapsed && (
-              <div>
-                <h2 className="font-semibold text-gray-900 dark:text-white">Tools</h2>
-              </div>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Editor</span>
             )}
             <button 
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-500"
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-gray-600"
             >
               {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
             </button>
           </div>
 
-          {/* Sidebar Actions */}
           <div className="flex-1 overflow-y-auto py-2">
-            <SidebarAction
-              icon={PlusCircle}
-              label="Add Section"
-              collapsed={sidebarCollapsed}
-              onClick={() => setShowAddSectionModal(true)}
-              color="blue"
-            />
-            
-            <SidebarAction
-              icon={Layout}
-              label="Templates"
-              collapsed={sidebarCollapsed}
-              onClick={() => toggleDrawer("templates")}
-              isActive={activeDrawer === "templates"}
-              color="purple"
-            />
-            
-            <SidebarAction
+            <SidebarItem
               icon={Palette}
-              label="Design"
+              label="Design & Fonts"
+              sublabel="Customize look"
               collapsed={sidebarCollapsed}
               onClick={() => toggleDrawer("design")}
               isActive={activeDrawer === "design"}
-              color="pink"
             />
             
-            <SidebarAction
-              icon={Eye}
-              label="Preview"
+            <SidebarItem
+              icon={PlusCircle}
+              label="Add Section"
+              sublabel="More sections"
               collapsed={sidebarCollapsed}
-              onClick={() => setShowPreviewModal(true)}
-              color="green"
+              onClick={() => setShowAddSectionModal(true)}
             />
-            
-            <SidebarAction
+
+            <div className={`my-3 ${sidebarCollapsed ? 'mx-2' : 'mx-3'}`}>
+              <div className="h-px bg-gray-100 dark:bg-gray-800" />
+            </div>
+
+            {!sidebarCollapsed && (
+              <button
+                onClick={() => setContentExpanded(!contentExpanded)}
+                className="w-full px-3 py-1.5 flex items-center justify-between text-xs font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-600 transition-colors"
+              >
+                <span>Content</span>
+                <ChevronDown className={`w-3 h-3 transition-transform ${contentExpanded ? 'rotate-180' : ''}`} />
+              </button>
+            )}
+
+            <AnimatePresence>
+              {(contentExpanded || sidebarCollapsed) && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  {SECTION_CONFIG.map((section) => {
+                    const isActive = isSectionActive(section.id);
+                    if (!isActive && section.id !== 'header' && section.id !== 'summary') return null;
+                    
+                    return (
+                      <ContentSectionItem
+                        key={section.id}
+                        icon={section.icon}
+                        label={section.label}
+                        collapsed={sidebarCollapsed}
+                        onClick={() => handleSectionClick(section.id)}
+                        isFocused={focusedSection === section.id}
+                      />
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className={`my-3 ${sidebarCollapsed ? 'mx-2' : 'mx-3'}`}>
+              <div className="h-px bg-gray-100 dark:bg-gray-800" />
+            </div>
+
+            <SidebarItem
               icon={History}
               label="History"
               collapsed={sidebarCollapsed}
               onClick={() => toggleDrawer("history")}
               isActive={activeDrawer === "history"}
-              color="orange"
-            />
-
-            <div className="my-3 mx-3 border-t border-gray-100 dark:border-gray-800" />
-
-            <SidebarAction
-              icon={Share2}
-              label="Share"
-              collapsed={sidebarCollapsed}
-              onClick={() => {}}
-              color="indigo"
-            />
-            
-            <SidebarAction
-              icon={Sparkles}
-              label="AI Enhance"
-              collapsed={sidebarCollapsed}
-              onClick={() => {}}
-              color="cyan"
             />
           </div>
         </motion.div>
 
-        {/* Drawer Panel */}
         <AnimatePresence mode="wait">
           {activeDrawer && (
             <motion.div
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 320, opacity: 1 }}
+              animate={{ width: 300, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
               className="bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 overflow-hidden flex flex-col z-10"
             >
-              <div className="w-80 h-full flex flex-col">
+              <div className="w-[300px] h-full flex flex-col">
                 <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
                   <h3 className="font-semibold text-gray-900 dark:text-white capitalize">{activeDrawer}</h3>
                   <button 
@@ -556,35 +609,35 @@ function EditorContent() {
                         <div className="grid grid-cols-2 gap-2">
                           <button
                             onClick={() => setDesign({ ...design, layout: 'single-column' })}
-                            className={`p-4 rounded-xl border-2 transition-all ${
+                            className={`p-3 rounded-xl border-2 transition-all ${
                               design.layout === 'single-column'
                                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                                 : 'border-gray-200 dark:border-gray-700'
                             }`}
                           >
-                            <div className="w-full aspect-[3/4] bg-gray-200 dark:bg-gray-700 rounded-lg flex flex-col gap-1 p-2">
-                              <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded" />
-                              <div className="h-2 bg-gray-300 dark:bg-gray-600 rounded w-3/4" />
-                              <div className="flex-1 bg-gray-300 dark:bg-gray-600 rounded mt-1" />
+                            <div className="w-full aspect-[3/4] bg-gray-100 dark:bg-gray-700 rounded-lg flex flex-col gap-1 p-2">
+                              <div className="h-2 bg-gray-300 dark:bg-gray-600 rounded" />
+                              <div className="h-1.5 bg-gray-200 dark:bg-gray-600 rounded w-3/4" />
+                              <div className="flex-1 bg-gray-200 dark:bg-gray-600 rounded mt-1" />
                             </div>
-                            <div className="text-xs font-medium mt-2 text-center">Single Column</div>
+                            <div className="text-xs font-medium mt-2 text-center text-gray-700 dark:text-gray-300">Single</div>
                           </button>
                           <button
                             onClick={() => setDesign({ ...design, layout: 'two-column' })}
-                            className={`p-4 rounded-xl border-2 transition-all ${
+                            className={`p-3 rounded-xl border-2 transition-all ${
                               design.layout === 'two-column'
                                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                                 : 'border-gray-200 dark:border-gray-700'
                             }`}
                           >
-                            <div className="w-full aspect-[3/4] bg-gray-200 dark:bg-gray-700 rounded-lg flex gap-1 p-2">
+                            <div className="w-full aspect-[3/4] bg-gray-100 dark:bg-gray-700 rounded-lg flex gap-1 p-2">
                               <div className="w-1/3 bg-gray-300 dark:bg-gray-600 rounded" />
                               <div className="flex-1 flex flex-col gap-1">
-                                <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded" />
-                                <div className="flex-1 bg-gray-300 dark:bg-gray-600 rounded" />
+                                <div className="h-2 bg-gray-300 dark:bg-gray-600 rounded" />
+                                <div className="flex-1 bg-gray-200 dark:bg-gray-600 rounded" />
                               </div>
                             </div>
-                            <div className="text-xs font-medium mt-2 text-center">Two Column</div>
+                            <div className="text-xs font-medium mt-2 text-center text-gray-700 dark:text-gray-300">Two Col</div>
                           </button>
                         </div>
                       </div>
@@ -606,38 +659,14 @@ function EditorContent() {
           )}
         </AnimatePresence>
 
-        {/* Main Preview Area */}
-        <div className="flex-1 bg-gray-100 dark:bg-gray-900 flex flex-col overflow-hidden">
-          {/* Preview Controls */}
-          <div className="h-12 px-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-sm shrink-0">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Live Preview</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={handleZoomOut}
-                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                disabled={zoomLevel <= 0.5}
-              >
-                <ZoomOut className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-              </button>
-              <span className="text-sm text-gray-600 dark:text-gray-400 w-14 text-center">
-                {Math.round(zoomLevel * 100)}%
-              </span>
-              <button
-                onClick={handleZoomIn}
-                className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                disabled={zoomLevel >= 1.5}
-              >
-                <ZoomIn className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-              </button>
-            </div>
-          </div>
-
-          {/* Resume Preview */}
+        <div className="flex-1 bg-gray-200 dark:bg-gray-900 flex flex-col overflow-hidden">
           <div 
-            className="flex-1 overflow-auto p-6 flex justify-center"
-            onClick={() => activeDrawer && setActiveDrawer(null)}
+            ref={resumeContainerRef}
+            className="flex-1 overflow-auto p-8 flex justify-center"
+            onClick={() => {
+              if (activeDrawer) setActiveDrawer(null);
+              setFocusedSection(null);
+            }}
           >
             {selectedTemplate ? (
               <div 
@@ -651,6 +680,7 @@ function EditorContent() {
                     styles={design.theme}
                     sectionConfig={sectionConfig}
                     isInteractive={true}
+                    focusedSection={focusedSection}
                     onReorder={reorderSections}
                     onContentChange={handleContentChange}
                   />
@@ -667,13 +697,11 @@ function EditorContent() {
           </div>
         </div>
 
-        {/* Add Section Modal */}
         <AddSectionModal
           isOpen={showAddSectionModal}
           onClose={() => setShowAddSectionModal(false)}
         />
 
-        {/* Preview Modal (Full Screen) */}
         <AnimatePresence>
           {showPreviewModal && (
             <motion.div 
@@ -727,48 +755,89 @@ function EditorContent() {
   );
 }
 
-function SidebarAction({ 
+function SidebarItem({ 
   icon: Icon, 
   label, 
+  sublabel,
   collapsed, 
   onClick, 
   isActive = false,
-  color = 'gray'
 }: { 
   icon: any; 
-  label: string; 
+  label: string;
+  sublabel?: string;
   collapsed: boolean; 
   onClick: () => void;
   isActive?: boolean;
-  color?: string;
 }) {
-  const colorClasses: Record<string, string> = {
-    blue: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-    purple: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
-    pink: 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400',
-    green: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-    orange: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
-    indigo: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
-    cyan: 'bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400',
-    gray: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-  };
-
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-3 py-2.5 mx-auto transition-all relative group ${
+      className={`w-full flex items-center gap-3 px-3 py-2 transition-all relative group ${
         collapsed ? 'justify-center' : ''
-      } ${isActive ? 'bg-gray-100 dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+      } ${isActive ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
       title={collapsed ? label : undefined}
     >
       {isActive && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-600 rounded-r-full" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-8 bg-blue-600 rounded-r" />
       )}
-      <div className={`p-2 rounded-xl ${colorClasses[color]} transition-transform group-hover:scale-105`}>
+      <div className={`p-2 rounded-lg transition-colors ${
+        isActive 
+          ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400' 
+          : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-700'
+      }`}>
         <Icon className="w-4 h-4" />
       </div>
       {!collapsed && (
-        <span className={`text-sm font-medium ${isActive ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
+        <div className="flex-1 text-left">
+          <span className={`text-sm font-medium block ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}`}>
+            {label}
+          </span>
+          {sublabel && (
+            <span className="text-xs text-gray-400">{sublabel}</span>
+          )}
+        </div>
+      )}
+    </button>
+  );
+}
+
+function ContentSectionItem({ 
+  icon: Icon, 
+  label, 
+  collapsed, 
+  onClick,
+  isFocused = false,
+}: { 
+  icon: any; 
+  label: string;
+  collapsed: boolean; 
+  onClick: () => void;
+  isFocused?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-3 py-1.5 transition-all relative group ${
+        collapsed ? 'justify-center' : ''
+      } ${isFocused ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+      title={collapsed ? label : undefined}
+    >
+      {isFocused && (
+        <motion.div 
+          layoutId="section-indicator"
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-blue-600 rounded-r" 
+        />
+      )}
+      <div className={`p-1.5 rounded-md transition-colors ${
+        isFocused 
+          ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400' 
+          : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'
+      }`}>
+        <Icon className="w-4 h-4" />
+      </div>
+      {!collapsed && (
+        <span className={`text-sm ${isFocused ? 'text-blue-600 font-medium dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
           {label}
         </span>
       )}

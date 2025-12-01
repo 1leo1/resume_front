@@ -6,9 +6,13 @@ interface ResumeStore {
     resumeData: ResumeContent;
     design: ResumeDesign;
     resumeId: number | null;
+    focusedSection: string | null;
+    activeSections: string[];
     setResumeData: (data: ResumeContent) => void;
     setDesign: (design: ResumeDesign) => void;
     setResumeId: (id: number) => void;
+    setFocusedSection: (sectionId: string | null) => void;
+    removeSection: (sectionId: string) => void;
     updateBasics: (field: keyof ResumeContent["basics"], value: unknown) => void;
     // Work Experience
     addWork: (work: Work) => void;
@@ -76,10 +80,12 @@ const initialDesign: ResumeDesign = {
     }
 };
 
-export const useResumeStore = create<ResumeStore>((set) => ({
+export const useResumeStore = create<ResumeStore>((set, get) => ({
     resumeData: initialContent,
     design: initialDesign,
     resumeId: null,
+    focusedSection: null,
+    activeSections: ["header", "summary", "work", "education", "skills", "projects"],
     sectionConfig: {
         order: ["work", "education", "skills", "projects"],
         hidden: [],
@@ -88,6 +94,13 @@ export const useResumeStore = create<ResumeStore>((set) => ({
     setResumeData: (data) => set({ resumeData: data }),
     setDesign: (design) => set({ design }),
     setResumeId: (id) => set({ resumeId: id }),
+    setFocusedSection: (sectionId) => set({ focusedSection: sectionId }),
+    removeSection: (sectionId) => set((state) => ({
+        sectionConfig: {
+            ...state.sectionConfig,
+            hidden: [...state.sectionConfig.hidden, sectionId]
+        }
+    })),
 
     setTemplate: (template) =>
         set((state) => {

@@ -18,7 +18,7 @@ const ActionButton = ({ onClick, children, variant = 'add' }: { onClick: () => v
     <button
         onClick={onClick}
         className={`
-            flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition-all
+            flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition-all mt-3
             ${variant === 'add' 
                 ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20' 
                 : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100'
@@ -26,6 +26,19 @@ const ActionButton = ({ onClick, children, variant = 'add' }: { onClick: () => v
         `}
     >
         {children}
+    </button>
+);
+
+const DeleteButton = ({ onClick, className = "" }: { onClick: () => void; className?: string }) => (
+    <button
+        onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+        }}
+        className={`flex-shrink-0 p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md opacity-0 group-hover:opacity-100 transition-all ${className}`}
+        title="Remove"
+    >
+        <Trash2 size={14} />
     </button>
 );
 
@@ -146,12 +159,7 @@ export const ContactSection = ({ data, styles, isEditable, onContentChange }: an
                             placeholder="Contact Info"
                         />
                         {isEditable && (
-                            <button
-                                onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))}
-                                className="opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:bg-red-50 rounded transition-all"
-                            >
-                                <Trash2 size={14} />
-                            </button>
+                            <DeleteButton onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))} />
                         )}
                     </div>
                 ))}
@@ -196,7 +204,7 @@ export const LanguagesSection = ({ data, styles, isEditable, onContentChange }: 
                 {data?.map((lang: any, index: number) => (
                     <div 
                         key={index} 
-                        className="group flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg"
+                        className="group flex items-center gap-2 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-colors"
                     >
                         <EditableText
                             value={lang.language}
@@ -214,12 +222,7 @@ export const LanguagesSection = ({ data, styles, isEditable, onContentChange }: 
                             placeholder="Level"
                         />
                         {isEditable && (
-                            <button
-                                onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))}
-                                className="opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:bg-red-100 rounded transition-all"
-                            >
-                                <Trash2 size={12} />
-                            </button>
+                            <DeleteButton onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))} />
                         )}
                     </div>
                 ))}
@@ -245,22 +248,29 @@ export const AwardsSection = ({ data, styles, isEditable, onContentChange }: any
             <SectionTitle title="Awards & Achievements" color={styles?.colors?.primary} />
             <div className="space-y-4">
                 {data?.map((award: any, index: number) => (
-                    <div key={index} className="group relative pl-4 border-l-2 border-gray-200 hover:border-blue-400 transition-colors">
-                        <div className="flex items-start justify-between">
-                            <EditableText
-                                value={award.title}
-                                onChange={(val) => handleAwardChange(index, 'title', val)}
-                                isEditable={isEditable}
-                                style={{ fontWeight: 600, color: '#1f2937', fontSize: '0.95rem' }}
-                                placeholder="Award Title"
-                            />
-                            <EditableText
-                                value={award.date}
-                                onChange={(val) => handleAwardChange(index, 'date', val)}
-                                isEditable={isEditable}
-                                style={{ color: '#6b7280', fontSize: '0.85rem' }}
-                                placeholder="Year"
-                            />
+                    <div key={index} className="group pl-4 border-l-2 border-gray-200 hover:border-blue-400 transition-colors">
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                                <EditableText
+                                    value={award.title}
+                                    onChange={(val) => handleAwardChange(index, 'title', val)}
+                                    isEditable={isEditable}
+                                    style={{ fontWeight: 600, color: '#1f2937', fontSize: '0.95rem' }}
+                                    placeholder="Award Title"
+                                />
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <EditableText
+                                    value={award.date}
+                                    onChange={(val) => handleAwardChange(index, 'date', val)}
+                                    isEditable={isEditable}
+                                    style={{ color: '#6b7280', fontSize: '0.85rem' }}
+                                    placeholder="Year"
+                                />
+                                {isEditable && (
+                                    <DeleteButton onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))} />
+                                )}
+                            </div>
                         </div>
                         <EditableText
                             value={award.awarder}
@@ -279,14 +289,6 @@ export const AwardsSection = ({ data, styles, isEditable, onContentChange }: any
                                 style={{ fontSize: '0.875rem', color: '#4b5563', marginTop: '0.25rem' }}
                                 placeholder="Brief description..."
                             />
-                        )}
-                        {isEditable && (
-                            <button
-                                onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))}
-                                className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:bg-red-50 rounded transition-all"
-                            >
-                                <Trash2 size={14} />
-                            </button>
                         )}
                     </div>
                 ))}
@@ -312,9 +314,9 @@ export const VolunteerSection = ({ data, styles, isEditable, onContentChange }: 
             <SectionTitle title="Volunteer Experience" color={styles?.colors?.primary} />
             <div className="space-y-4">
                 {data?.map((vol: any, index: number) => (
-                    <div key={index} className="group relative">
-                        <div className="flex items-start justify-between">
-                            <div>
+                    <div key={index} className="group">
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
                                 <EditableText
                                     value={vol.position}
                                     onChange={(val) => handleVolChange(index, 'position', val)}
@@ -330,20 +332,25 @@ export const VolunteerSection = ({ data, styles, isEditable, onContentChange }: 
                                     placeholder="Organization Name"
                                 />
                             </div>
-                            <div className="text-right text-sm text-gray-500">
-                                <EditableText
-                                    value={vol.startDate}
-                                    onChange={(val) => handleVolChange(index, 'startDate', val)}
-                                    isEditable={isEditable}
-                                    placeholder="Start"
-                                />
-                                <span className="mx-1">-</span>
-                                <EditableText
-                                    value={vol.endDate}
-                                    onChange={(val) => handleVolChange(index, 'endDate', val)}
-                                    isEditable={isEditable}
-                                    placeholder="End"
-                                />
+                            <div className="flex items-center gap-2 shrink-0">
+                                <div className="text-sm text-gray-500">
+                                    <EditableText
+                                        value={vol.startDate}
+                                        onChange={(val) => handleVolChange(index, 'startDate', val)}
+                                        isEditable={isEditable}
+                                        placeholder="Start"
+                                    />
+                                    <span className="mx-1">-</span>
+                                    <EditableText
+                                        value={vol.endDate}
+                                        onChange={(val) => handleVolChange(index, 'endDate', val)}
+                                        isEditable={isEditable}
+                                        placeholder="End"
+                                    />
+                                </div>
+                                {isEditable && (
+                                    <DeleteButton onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))} />
+                                )}
                             </div>
                         </div>
                         {(vol.summary || isEditable) && (
@@ -356,14 +363,6 @@ export const VolunteerSection = ({ data, styles, isEditable, onContentChange }: 
                                 style={{ fontSize: '0.875rem', color: '#4b5563', marginTop: '0.5rem', lineHeight: '1.6' }}
                                 placeholder="Describe your contributions..."
                             />
-                        )}
-                        {isEditable && (
-                            <button
-                                onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))}
-                                className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:bg-red-50 rounded transition-all"
-                            >
-                                <Trash2 size={14} />
-                            </button>
                         )}
                     </div>
                 ))}
@@ -389,14 +388,21 @@ export const ReferencesSection = ({ data, styles, isEditable, onContentChange }:
             <SectionTitle title="References" color={styles?.colors?.primary} />
             <div className="space-y-4">
                 {data?.map((ref: any, index: number) => (
-                    <div key={index} className="group relative bg-gray-50 p-4 rounded-lg">
-                        <EditableText
-                            value={ref.name}
-                            onChange={(val) => handleRefChange(index, 'name', val)}
-                            isEditable={isEditable}
-                            style={{ fontWeight: 600, color: '#1f2937', fontSize: '0.95rem', display: 'block' }}
-                            placeholder="Reference Name"
-                        />
+                    <div key={index} className="group bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                                <EditableText
+                                    value={ref.name}
+                                    onChange={(val) => handleRefChange(index, 'name', val)}
+                                    isEditable={isEditable}
+                                    style={{ fontWeight: 600, color: '#1f2937', fontSize: '0.95rem', display: 'block' }}
+                                    placeholder="Reference Name"
+                                />
+                            </div>
+                            {isEditable && (
+                                <DeleteButton onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))} />
+                            )}
+                        </div>
                         <EditableText
                             value={ref.reference}
                             onChange={(val) => handleRefChange(index, 'reference', val)}
@@ -406,14 +412,6 @@ export const ReferencesSection = ({ data, styles, isEditable, onContentChange }:
                             style={{ fontSize: '0.875rem', color: '#4b5563', fontStyle: 'italic', marginTop: '0.5rem', lineHeight: '1.6' }}
                             placeholder="Reference details or testimonial..."
                         />
-                        {isEditable && (
-                            <button
-                                onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))}
-                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:bg-red-100 rounded transition-all"
-                            >
-                                <Trash2 size={14} />
-                            </button>
-                        )}
                     </div>
                 ))}
             </div>
@@ -438,9 +436,9 @@ export const WorkSection = ({ data, styles, isEditable, onContentChange }: any) 
             <SectionTitle title="Experience" color={styles?.colors?.primary} />
             <div className="space-y-5">
                 {data?.map((job: any, index: number) => (
-                    <div key={index} className="group relative">
-                        <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
+                    <div key={index} className="group">
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
                                 <EditableText
                                     value={job.position}
                                     onChange={(val) => handleJobChange(index, 'position', val)}
@@ -456,22 +454,27 @@ export const WorkSection = ({ data, styles, isEditable, onContentChange }: any) 
                                     placeholder="Company Name"
                                 />
                             </div>
-                            <div className="text-right text-sm text-gray-500 shrink-0">
-                                <div className="flex items-center gap-1">
-                                    <EditableText
-                                        value={job.startDate}
-                                        onChange={(val) => handleJobChange(index, 'startDate', val)}
-                                        isEditable={isEditable}
-                                        placeholder="Start"
-                                    />
-                                    <span>-</span>
-                                    <EditableText
-                                        value={job.endDate}
-                                        onChange={(val) => handleJobChange(index, 'endDate', val)}
-                                        isEditable={isEditable}
-                                        placeholder="Present"
-                                    />
+                            <div className="flex items-center gap-2 shrink-0">
+                                <div className="text-sm text-gray-500">
+                                    <div className="flex items-center gap-1">
+                                        <EditableText
+                                            value={job.startDate}
+                                            onChange={(val) => handleJobChange(index, 'startDate', val)}
+                                            isEditable={isEditable}
+                                            placeholder="Start"
+                                        />
+                                        <span>-</span>
+                                        <EditableText
+                                            value={job.endDate}
+                                            onChange={(val) => handleJobChange(index, 'endDate', val)}
+                                            isEditable={isEditable}
+                                            placeholder="Present"
+                                        />
+                                    </div>
                                 </div>
+                                {isEditable && (
+                                    <DeleteButton onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))} />
+                                )}
                             </div>
                         </div>
                         <EditableText
@@ -483,14 +486,6 @@ export const WorkSection = ({ data, styles, isEditable, onContentChange }: any) 
                             style={{ fontSize: '0.875rem', color: '#4b5563', marginTop: '0.5rem', lineHeight: '1.7' }}
                             placeholder="Describe your key responsibilities and achievements..."
                         />
-                        {isEditable && (
-                            <button
-                                onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))}
-                                className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            >
-                                <Trash2 size={14} />
-                            </button>
-                        )}
                     </div>
                 ))}
             </div>
@@ -515,9 +510,9 @@ export const EducationSection = ({ data, styles, isEditable, onContentChange }: 
             <SectionTitle title="Education" color={styles?.colors?.primary} />
             <div className="space-y-4">
                 {data?.map((edu: any, index: number) => (
-                    <div key={index} className="group relative">
-                        <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
+                    <div key={index} className="group">
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
                                 <EditableText
                                     value={edu.institution}
                                     onChange={(val) => handleEduChange(index, 'institution', val)}
@@ -525,7 +520,7 @@ export const EducationSection = ({ data, styles, isEditable, onContentChange }: 
                                     style={{ fontWeight: 600, color: '#1f2937', fontSize: '0.95rem' }}
                                     placeholder="University/School Name"
                                 />
-                                <div className="flex items-center gap-1 text-gray-600 text-sm">
+                                <div className="flex items-center gap-1 text-gray-600 text-sm flex-wrap">
                                     <EditableText
                                         value={edu.studyType}
                                         onChange={(val) => handleEduChange(index, 'studyType', val)}
@@ -545,32 +540,29 @@ export const EducationSection = ({ data, styles, isEditable, onContentChange }: 
                                     )}
                                 </div>
                             </div>
-                            <div className="text-right text-sm text-gray-500 shrink-0">
-                                <div className="flex items-center gap-1">
-                                    <EditableText
-                                        value={edu.startDate}
-                                        onChange={(val) => handleEduChange(index, 'startDate', val)}
-                                        isEditable={isEditable}
-                                        placeholder="Start"
-                                    />
-                                    <span>-</span>
-                                    <EditableText
-                                        value={edu.endDate}
-                                        onChange={(val) => handleEduChange(index, 'endDate', val)}
-                                        isEditable={isEditable}
-                                        placeholder="End"
-                                    />
+                            <div className="flex items-center gap-2 shrink-0">
+                                <div className="text-sm text-gray-500">
+                                    <div className="flex items-center gap-1">
+                                        <EditableText
+                                            value={edu.startDate}
+                                            onChange={(val) => handleEduChange(index, 'startDate', val)}
+                                            isEditable={isEditable}
+                                            placeholder="Start"
+                                        />
+                                        <span>-</span>
+                                        <EditableText
+                                            value={edu.endDate}
+                                            onChange={(val) => handleEduChange(index, 'endDate', val)}
+                                            isEditable={isEditable}
+                                            placeholder="End"
+                                        />
+                                    </div>
                                 </div>
+                                {isEditable && (
+                                    <DeleteButton onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))} />
+                                )}
                             </div>
                         </div>
-                        {isEditable && (
-                            <button
-                                onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))}
-                                className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            >
-                                <Trash2 size={14} />
-                            </button>
-                        )}
                     </div>
                 ))}
             </div>
@@ -601,7 +593,7 @@ export const SkillsSection = ({ data, styles, isEditable, onContentChange }: any
                 {data?.map((skill: any, index: number) => (
                     <div 
                         key={index} 
-                        className="group relative inline-flex items-center gap-1 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full transition-colors"
+                        className="group inline-flex items-center bg-gray-100 hover:bg-gray-200 pl-3 pr-2 py-1.5 rounded-full transition-colors"
                     >
                         <EditableText
                             value={skill.name}
@@ -612,8 +604,12 @@ export const SkillsSection = ({ data, styles, isEditable, onContentChange }: any
                         />
                         {isEditable && (
                             <button
-                                onClick={() => handleRemoveSkill(index)}
-                                className="opacity-0 group-hover:opacity-100 ml-1 p-0.5 text-red-500 hover:text-red-700 transition-all"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemoveSkill(index);
+                                }}
+                                className="flex-shrink-0 ml-1 p-0.5 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                                title="Remove skill"
                             >
                                 <Trash2 size={12} />
                             </button>
@@ -642,9 +638,9 @@ export const ProjectsSection = ({ data, styles, isEditable, onContentChange }: a
             <SectionTitle title="Projects" color={styles?.colors?.primary} />
             <div className="space-y-4">
                 {data?.map((project: any, index: number) => (
-                    <div key={index} className="group relative">
-                        <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
+                    <div key={index} className="group">
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
                                 <EditableText
                                     value={project.name}
                                     onChange={(val) => handleProjectChange(index, 'name', val)}
@@ -662,25 +658,30 @@ export const ProjectsSection = ({ data, styles, isEditable, onContentChange }: a
                                     />
                                 )}
                             </div>
-                            {(project.startDate || project.endDate || isEditable) && (
-                                <div className="text-right text-sm text-gray-500 shrink-0">
-                                    <div className="flex items-center gap-1">
-                                        <EditableText
-                                            value={project.startDate}
-                                            onChange={(val) => handleProjectChange(index, 'startDate', val)}
-                                            isEditable={isEditable}
-                                            placeholder="Start"
-                                        />
-                                        <span>-</span>
-                                        <EditableText
-                                            value={project.endDate}
-                                            onChange={(val) => handleProjectChange(index, 'endDate', val)}
-                                            isEditable={isEditable}
-                                            placeholder="End"
-                                        />
+                            <div className="flex items-center gap-2 shrink-0">
+                                {(project.startDate || project.endDate || isEditable) && (
+                                    <div className="text-sm text-gray-500">
+                                        <div className="flex items-center gap-1">
+                                            <EditableText
+                                                value={project.startDate}
+                                                onChange={(val) => handleProjectChange(index, 'startDate', val)}
+                                                isEditable={isEditable}
+                                                placeholder="Start"
+                                            />
+                                            <span>-</span>
+                                            <EditableText
+                                                value={project.endDate}
+                                                onChange={(val) => handleProjectChange(index, 'endDate', val)}
+                                                isEditable={isEditable}
+                                                placeholder="End"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                                {isEditable && (
+                                    <DeleteButton onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))} />
+                                )}
+                            </div>
                         </div>
                         <EditableText
                             value={project.description}
@@ -691,14 +692,6 @@ export const ProjectsSection = ({ data, styles, isEditable, onContentChange }: a
                             style={{ fontSize: '0.875rem', color: '#4b5563', marginTop: '0.5rem', lineHeight: '1.7' }}
                             placeholder="Describe the project, technologies used, and your contributions..."
                         />
-                        {isEditable && (
-                            <button
-                                onClick={() => onContentChange(data.filter((_: any, i: number) => i !== index))}
-                                className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            >
-                                <Trash2 size={14} />
-                            </button>
-                        )}
                     </div>
                 ))}
             </div>
