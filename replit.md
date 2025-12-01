@@ -103,17 +103,44 @@ When backend is ready, update the `NEXT_PUBLIC_BACKEND_URL` environment variable
 
 ## Session Changes (December 1, 2025)
 
+### 5 World-Class Resume Templates
+Created production-ready templates in `templates_update.sql`:
+1. **Executive Suite** - Elegant two-column design for C-level executives with leadership focus (Georgia font, #1e293b primary)
+2. **Creative Portfolio** - Bold asymmetric layout for designers and creatives (Purple/Violet, #7c3aed primary)
+3. **Academic Scholar** - Comprehensive single-column design for researchers and academics (Blue, #0369a1 primary)
+4. **Minimal ATS** - Clean ATS-optimized single-column layout for tech/corporate roles (#111827 primary)
+5. **Healthcare Professional** - Professional two-column design for medical practitioners (Cyan, #0891b2 primary)
+
+Each template includes:
+- Optimized layout (single or two-column with proper column widths)
+- Industry-specific styling and colors
+- Comprehensive dummy data for all sections
+- Support for all 11 section types via headless architecture
+
+### Gold-Standard Text Input Fix
+Fixed recurring text field overlapping/squeezing issue in editor:
+- **Problem**: EditableText component used negative margins (`-mx-1.5 -my-0.5`) that caused layout shifts when focused
+- **Solution**: Implemented wrapper approach where:
+  - Wrapper div handles all visual feedback (background, ring, padding)
+  - ContentEditable element stays inline without padding tricks
+  - Uses `display: inline-block` and `box-sizing: border-box` for predictable layout
+  - Prevents text from overlapping adjacent content or jumping to previous lines
+- **Result**: All templates now support clean, reliable inline editing without layout disturbances
+
 ### Editor Page Redesign
 - **New header design**: Modern header with ClayCV branding, inline document name editing, and prominent Download PDF button
 - **Collapsible sidebar**: Tools section with colorful action cards (Add Section, Templates, Design, Preview, History, Share, AI Enhance)
 - **Live preview improvements**: Added zoom controls (zoom in/out buttons with percentage display)
 - **Fallback data system**: Added default templates and sample resume data (Alex Chen profile) so the editor works without backend API
 - **Better section editing**: Improved inline editing experience with hover states and add/remove controls
+- **Section highlighting**: Click Content sidebar items to highlight corresponding section on template preview
 
 ### Technical Changes
 - Made Supabase authentication fully optional throughout the app (client.ts, server.ts, middleware.ts)
 - Added DEFAULT_TEMPLATE, DEFAULT_TEMPLATES, and DEFAULT_RESUME_DATA constants for offline operation
 - Frontend gracefully degrades when backend APIs are unavailable
+- Implemented headless architecture: ResumeContent data separated from Template structure and SectionRegistry
+- All 11 section types supported: header, summary, work, education, skills, projects, languages, awards, volunteer, references, contact
 
 ---
 
