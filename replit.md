@@ -101,6 +101,22 @@ This is a **frontend-only** application. The following API endpoints are referen
 
 When backend is ready, update the `NEXT_PUBLIC_BACKEND_URL` environment variable.
 
+## Session Changes (December 1, 2025)
+
+### Editor Page Redesign
+- **New header design**: Modern header with ClayCV branding, inline document name editing, and prominent Download PDF button
+- **Collapsible sidebar**: Tools section with colorful action cards (Add Section, Templates, Design, Preview, History, Share, AI Enhance)
+- **Live preview improvements**: Added zoom controls (zoom in/out buttons with percentage display)
+- **Fallback data system**: Added default templates and sample resume data (Alex Chen profile) so the editor works without backend API
+- **Better section editing**: Improved inline editing experience with hover states and add/remove controls
+
+### Technical Changes
+- Made Supabase authentication fully optional throughout the app (client.ts, server.ts, middleware.ts)
+- Added DEFAULT_TEMPLATE, DEFAULT_TEMPLATES, and DEFAULT_RESUME_DATA constants for offline operation
+- Frontend gracefully degrades when backend APIs are unavailable
+
+---
+
 ## Session Changes (November 29, 2025)
 
 ### Bug Fixes
