@@ -75,6 +75,9 @@ export default function UploadPage() {
       // Get Supabase session token
       const { createClient } = await import("@/utils/supabase/client");
       const supabase = createClient();
+      if (!supabase) {
+        throw new Error("Supabase client not initialized");
+      }
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
