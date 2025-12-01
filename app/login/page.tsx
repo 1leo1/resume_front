@@ -20,6 +20,10 @@ export default function LoginPage() {
 
     const handleSocialLogin = async (provider: 'github' | 'linkedin_oidc') => {
         const supabase = createClient()
+        if (!supabase) {
+            console.error('Supabase not configured')
+            return
+        }
         await supabase.auth.signInWithOAuth({
             provider,
             options: {

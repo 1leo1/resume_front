@@ -14,6 +14,8 @@ export default function Navbar() {
   const supabase = createClient();
 
   useEffect(() => {
+    if (!supabase) return;
+
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);

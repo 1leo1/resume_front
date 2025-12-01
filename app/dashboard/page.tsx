@@ -21,6 +21,12 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const fetchResumes = async () => {
+            if (!supabase) {
+                router.push('/login')
+                setLoading(false)
+                return
+            }
+
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
                 router.push('/login')
@@ -49,6 +55,8 @@ export default function DashboardPage() {
 
     const handleDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this resume?')) return
+
+        if (!supabase) return
 
         const { data: { session } } = await supabase.auth.getSession()
         if (!session) return

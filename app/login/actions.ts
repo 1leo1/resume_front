@@ -7,6 +7,10 @@ import { createClient } from '@/utils/supabase/server'
 export async function login(prevState: any, formData: FormData) {
     const supabase = await createClient()
 
+    if (!supabase) {
+        return { error: 'Authentication service not configured' }
+    }
+
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
@@ -25,6 +29,10 @@ export async function login(prevState: any, formData: FormData) {
 
 export async function signup(prevState: any, formData: FormData) {
     const supabase = await createClient()
+
+    if (!supabase) {
+        return { error: 'Authentication service not configured' }
+    }
 
     const email = formData.get('email') as string
     const password = formData.get('password') as string
@@ -50,13 +58,20 @@ export async function signup(prevState: any, formData: FormData) {
 
 export async function signout() {
     const supabase = await createClient()
-    await supabase.auth.signOut()
+    if (supabase) {
+        await supabase.auth.signOut()
+    }
     revalidatePath('/', 'layout')
     redirect('/login')
 }
 
 export async function signInWithOAuth(provider: 'google' | 'github' | 'linkedin') {
     const supabase = await createClient()
+    
+    if (!supabase) {
+        return { error: 'Authentication service not configured' }
+    }
+
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
