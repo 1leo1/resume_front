@@ -103,6 +103,24 @@ When backend is ready, update the `NEXT_PUBLIC_BACKEND_URL` environment variable
 
 ## Session Changes (December 1, 2025)
 
+### Text Input Minimum Size Constraints - FIXED
+Fixed the issue where empty text boxes squeeze to ~1 character width when selected for editing:
+- **Enhancement**: Added `minWidth` and `minHeight` props to EditableText component
+- **Smart Defaults**: 
+  - Single-line fields: minWidth `120px`, minHeight `24px`
+  - Multi-line fields: minWidth `300px`, minHeight `80px`
+- **Per-Field Customization**: Name field now has minWidth `240px` and minHeight `48px` for comfortable editing
+- **Result**: All text fields maintain proper editing area even when empty, making it convenient for users to click and edit
+- **Implementation**: Applied `minWidth` and `minHeight` to the contentEditable element's inline styles
+
+### Fixed Missing Templates Button
+Restored the Templates button in the editor sidebar that was accidentally removed:
+- Button shows at the top of the Editor tools section with "Change layout" sublabel
+- Uses Layout icon for consistent visual language
+- Clicking opens templates drawer to switch between different resume layouts
+
+## Session Changes (Previous - December 1, 2025)
+
 ### 5 World-Class Resume Templates
 Created production-ready templates in `templates_update.sql`:
 1. **Executive Suite** - Elegant two-column design for C-level executives with leadership focus (Georgia font, #1e293b primary)
