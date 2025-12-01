@@ -4,6 +4,7 @@ import { login, signup } from './actions'
 import { useActionState, useState } from 'react'
 import { Loader2, Mail, Lock, ArrowRight, Github, Linkedin, FileText } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
+import Link from 'next/link'
 
 export default function LoginPage() {
     const [stateLogin, formActionLogin] = useActionState(login, null)
@@ -35,14 +36,14 @@ export default function LoginPage() {
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
 
                 <div className="relative z-10">
-                    <div className="flex items-center gap-3">
+                    <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
                         <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20 shadow-xl">
                             <FileText className="w-6 h-6 text-white" />
                         </div>
                         <span className="text-2xl font-bold text-white tracking-tight">
                             ClayCV
                         </span>
-                    </div>
+                    </Link>
                 </div>
 
                 <div className="relative z-10 max-w-md">
@@ -148,7 +149,7 @@ export default function LoginPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full flex items-center justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                                className="w-full flex items-center justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
                             >
                                 {isLoading ? (
                                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -167,7 +168,7 @@ export default function LoginPage() {
                             </span>
                             <button
                                 onClick={() => setIsLoginMode(!isLoginMode)}
-                                className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+                                className="font-medium text-blue-600 hover:text-blue-500 transition-colors cursor-pointer"
                             >
                                 {isLoginMode ? 'Sign up' : 'Sign in'}
                             </button>
