@@ -2,7 +2,7 @@
 
 import { login, signup } from './actions'
 import { useActionState, useState } from 'react'
-import { Loader2, Mail, Lock, ArrowRight, Github, Linkedin } from 'lucide-react'
+import { Loader2, Mail, Lock, ArrowRight, Github, Linkedin, FileText } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 
 export default function LoginPage() {
@@ -22,7 +22,7 @@ export default function LoginPage() {
         await supabase.auth.signInWithOAuth({
             provider,
             options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
+                redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://claycv.com'}/auth/callback`,
             },
         })
     }
@@ -35,8 +35,13 @@ export default function LoginPage() {
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
 
                 <div className="relative z-10">
-                    <div className="flex items-center gap-2">
-                        <img src="/logo.png" alt="ClayCV Logo" className="h-12 w-auto rounded-lg" />
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20 shadow-xl">
+                            <FileText className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-2xl font-bold text-white tracking-tight">
+                            ClayCV
+                        </span>
                     </div>
                 </div>
 
