@@ -9,6 +9,8 @@ interface EditableTextProps {
     tagName?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span' | 'div';
     placeholder?: string;
     multiline?: boolean;
+    minWidth?: string | number;
+    minHeight?: string | number;
 }
 
 export const EditableText: React.FC<EditableTextProps> = ({
@@ -19,7 +21,9 @@ export const EditableText: React.FC<EditableTextProps> = ({
     style,
     tagName = 'span',
     placeholder,
-    multiline = false
+    multiline = false,
+    minWidth = multiline ? '300px' : '120px',
+    minHeight = multiline ? '80px' : '24px'
 }) => {
     const [text, setText] = useState(value || '');
     const [isFocused, setIsFocused] = useState(false);
@@ -101,7 +105,8 @@ export const EditableText: React.FC<EditableTextProps> = ({
                     ...style, 
                     cursor: 'text',
                     display: 'inline-block',
-                    minWidth: '20px',
+                    minWidth,
+                    minHeight,
                     boxSizing: 'border-box',
                     whiteSpace: multiline ? 'pre-wrap' : 'nowrap',
                     wordWrap: multiline ? 'break-word' : 'normal',

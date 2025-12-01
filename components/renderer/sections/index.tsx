@@ -59,6 +59,8 @@ export const HeaderSection = ({ data, styles, isEditable, onContentChange }: any
                 isEditable={isEditable}
                 tagName="h1"
                 placeholder="Your Full Name"
+                minWidth="240px"
+                minHeight="48px"
                 style={{
                     color: styles?.colors?.primary || '#1f2937',
                     fontFamily: styles?.fontFamily?.header,
@@ -74,6 +76,8 @@ export const HeaderSection = ({ data, styles, isEditable, onContentChange }: any
                 isEditable={isEditable}
                 tagName="p"
                 placeholder="Professional Title"
+                minWidth="200px"
+                minHeight="28px"
                 style={{
                     color: '#6b7280',
                     fontSize: '1.125rem',
