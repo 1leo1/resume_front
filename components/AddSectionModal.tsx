@@ -1,4 +1,4 @@
-import { X, Plus, Briefcase, GraduationCap, Globe, FolderGit2, Award, Heart, BookOpen, Users, PlusCircle, User, FileText } from "lucide-react";
+import { X, Plus, Briefcase, GraduationCap, Globe, FolderGit2, Award, Heart, BookOpen, Users, PlusCircle, User, FileText, Mail } from "lucide-react";
 import { useResumeStore } from "@/store/useResumeStore";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -22,7 +22,7 @@ const SECTION_IMAGES: Record<string, string> = {
 };
 
 const AVAILABLE_SECTIONS = [
-    { id: "header", label: "Personal Info", icon: User, description: "Name, title, contact" },
+    { id: "header", label: "Personal Info", icon: User, description: "Name, title" },
     { id: "summary", label: "Summary", icon: FileText, description: "Professional summary" },
     { id: "work", label: "Experience", icon: Briefcase, description: "Work history" },
     { id: "education", label: "Education", icon: GraduationCap, description: "Degrees" },

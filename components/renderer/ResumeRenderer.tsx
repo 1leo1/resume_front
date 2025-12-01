@@ -143,16 +143,7 @@ export default function ResumeRenderer({ content, structure, styles, sectionConf
                             >
                                 <SortableContext items={sortedSections} strategy={verticalListSortingStrategy}>
                                     {sortedSections.map((sectionId) => {
-                                        // Handle aliases for visibility
-                                        const lowerId = sectionId.toLowerCase();
-                                        let checkId = sectionId;
-                                        if (lowerId === 'contact') checkId = 'header';
-                                        if (lowerId === 'experience') checkId = 'work';
-
-                                        // Debugging visibility
-                                        // console.log(`Checking visibility for ${sectionId} (checkId: ${checkId})`, sectionConfig?.hidden);
-
-                                        if (sectionConfig?.hidden?.includes(checkId) || sectionConfig?.hidden?.includes(lowerId)) {
+                                        if (sectionConfig?.hidden?.includes(sectionId)) {
                                             return null;
                                         }
 

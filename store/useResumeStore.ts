@@ -116,19 +116,11 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
                 (col: any) => col.sections
             );
 
-            // Normalize aliases to standard IDs
-            const normalizedOrder = templateSections.map((id: string) => {
-                const lowerId = id.toLowerCase();
-                if (lowerId === 'contact') return 'header';
-                if (lowerId === 'experience') return 'work';
-                return id;
-            });
-
             return {
                 design: newDesign,
                 sectionConfig: {
                     ...state.sectionConfig,
-                    order: normalizedOrder
+                    order: templateSections
                 }
             };
         }),

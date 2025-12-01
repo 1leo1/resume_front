@@ -4,7 +4,7 @@ import { Plus, Trash2, Mail, Phone, MapPin, Globe, Linkedin, Github } from 'luci
 
 const SectionTitle = ({ title, color, children }: { title: string; color?: string; children?: React.ReactNode }) => (
     <div className="flex items-center justify-between mb-4">
-        <h3 
+        <h3
             className="text-base font-semibold tracking-wide uppercase"
             style={{ color: color || '#2563eb' }}
         >
@@ -19,8 +19,8 @@ const ActionButton = ({ onClick, children, variant = 'add' }: { onClick: () => v
         onClick={onClick}
         className={`
             flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition-all mt-3
-            ${variant === 'add' 
-                ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20' 
+            ${variant === 'add'
+                ? 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20'
                 : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100'
             }
         `}
@@ -59,8 +59,8 @@ export const HeaderSection = ({ data, styles, isEditable, onContentChange }: any
                 isEditable={isEditable}
                 tagName="h1"
                 placeholder="Your Full Name"
-                style={{ 
-                    color: styles?.colors?.primary || '#1f2937', 
+                style={{
+                    color: styles?.colors?.primary || '#1f2937',
                     fontFamily: styles?.fontFamily?.header,
                     fontSize: '2rem',
                     fontWeight: 'bold',
@@ -74,7 +74,7 @@ export const HeaderSection = ({ data, styles, isEditable, onContentChange }: any
                 isEditable={isEditable}
                 tagName="p"
                 placeholder="Professional Title"
-                style={{ 
+                style={{
                     color: '#6b7280',
                     fontSize: '1.125rem',
                     marginTop: '0.25rem'
@@ -129,7 +129,7 @@ export const SummarySection = ({ data, styles, isEditable, onContentChange }: an
             tagName="p"
             placeholder="Write a compelling professional summary that highlights your key achievements and career objectives..."
             multiline
-            style={{ 
+            style={{
                 color: '#374151',
                 lineHeight: '1.7',
                 fontSize: '0.9rem'
@@ -163,17 +163,39 @@ export const ContactSection = ({ data, styles, isEditable, onContentChange }: an
                         )}
                     </div>
                 ))}
-                {!Array.isArray(data) && data && Object.entries(data).map(([key, value]: any, index: number) => (
-                    <div key={index} className="flex items-center gap-2">
-                        <span className="font-medium text-gray-500 capitalize text-sm w-20">{key}:</span>
-                        <EditableText
-                            value={value}
-                            onChange={(val) => onContentChange({ ...data, [key]: val })}
-                            isEditable={isEditable}
-                            style={{ color: '#374151', fontSize: '0.9rem' }}
-                        />
-                    </div>
-                ))}
+                {!Array.isArray(data) && data && Object.entries(data).map(([key, value]: any, index: number) => {
+                    if (typeof value === 'object' && value !== null) {
+                        if (key === 'location') {
+                            const locStr = [value.city, value.region, value.countryCode].filter(Boolean).join(', ');
+                            return (
+                                <div key={index} className="flex items-center gap-2">
+                                    <span className="font-medium text-gray-500 capitalize text-sm w-20">{key}:</span>
+                                    <EditableText
+                                        value={locStr}
+                                        onChange={(val) => {
+                                            const parts = val.split(',').map((s: string) => s.trim());
+                                            onContentChange({ ...data, location: { ...value, city: parts[0], region: parts[1] } });
+                                        }}
+                                        isEditable={isEditable}
+                                        style={{ color: '#374151', fontSize: '0.9rem' }}
+                                    />
+                                </div>
+                            );
+                        }
+                        return null;
+                    }
+                    return (
+                        <div key={index} className="flex items-center gap-2">
+                            <span className="font-medium text-gray-500 capitalize text-sm w-20">{key}:</span>
+                            <EditableText
+                                value={value}
+                                onChange={(val) => onContentChange({ ...data, [key]: val })}
+                                isEditable={isEditable}
+                                style={{ color: '#374151', fontSize: '0.9rem' }}
+                            />
+                        </div>
+                    );
+                })}
             </div>
             {isEditable && (
                 <ActionButton onClick={() => {
@@ -202,8 +224,8 @@ export const LanguagesSection = ({ data, styles, isEditable, onContentChange }: 
             <SectionTitle title="Languages" color={styles?.colors?.primary} />
             <div className="flex flex-wrap gap-2">
                 {data?.map((lang: any, index: number) => (
-                    <div 
-                        key={index} 
+                    <div
+                        key={index}
                         className="group flex items-center gap-2 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-colors"
                     >
                         <EditableText
@@ -591,8 +613,8 @@ export const SkillsSection = ({ data, styles, isEditable, onContentChange }: any
             <SectionTitle title="Skills" color={styles?.colors?.primary} />
             <div className="flex flex-wrap gap-2">
                 {data?.map((skill: any, index: number) => (
-                    <div 
-                        key={index} 
+                    <div
+                        key={index}
                         className="group inline-flex items-center bg-gray-100 hover:bg-gray-200 pl-3 pr-2 py-1.5 rounded-full transition-colors"
                     >
                         <EditableText

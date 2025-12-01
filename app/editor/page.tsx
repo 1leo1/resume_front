@@ -16,8 +16,8 @@ import ResumeRenderer from "@/components/renderer/ResumeRenderer";
 import BlueprintSelector from "@/components/editor/BlueprintSelector";
 import SectionManager from "@/components/editor/SectionManager";
 import AddSectionModal from "@/components/AddSectionModal";
-import { getFinalSections } from "@/utils/resumeAssembler";
 import { JobBlueprint } from "@/types/blueprint";
+import { getFinalSections } from "@/utils/resumeAssembler";
 
 const DEFAULT_TEMPLATE = {
   id: 1,
@@ -203,6 +203,7 @@ function EditorContent() {
               ? data.find((t: any) => t.id === parseInt(templateIdParam))
               : data[0];
             const templateToUse = initialTemplate || data[0];
+
             setSelectedTemplate(templateToUse);
             setTemplate(templateToUse);
 
