@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Pencil } from 'lucide-react';
 
 interface EditableTextProps {
     value: string;
@@ -64,39 +63,53 @@ export const EditableText: React.FC<EditableTextProps> = ({
         );
     }
 
+    // Gold standard wrapper approach: wrapper handles all visual feedback,
+    // contentEditable element stays inline without layout-breaking padding/margin
     return (
-        <Tag
-            ref={contentRef}
-            contentEditable
-            suppressContentEditableWarning
-            onBlur={handleBlur}
-            onFocus={handleFocus}
-            onKeyDown={handleKeyDown}
+        <div
             className={`
-                ${className} 
+                inline-block
                 outline-none 
                 rounded-md 
-                px-1.5 
-                py-0.5 
-                -mx-1.5 
-                -my-0.5 
                 transition-all 
                 duration-150
                 relative
                 ${isFocused 
-                    ? 'bg-blue-50 ring-2 ring-blue-400 dark:bg-blue-900/20 dark:ring-blue-500' 
+                    ? 'bg-blue-50 ring-2 ring-blue-400 dark:bg-blue-900/20 dark:ring-blue-500 px-1.5 py-0.5' 
                     : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
                 }
-                ${isEmpty && !isFocused ? 'text-gray-400' : ''}
             `}
-            style={{ 
-                ...style, 
+            style={{
+                boxSizing: 'border-box',
                 cursor: 'text',
-                minWidth: '20px',
             }}
-            data-placeholder={placeholder}
         >
-            {displayValue || (isFocused ? '' : placeholder)}
-        </Tag>
+            <Tag
+                ref={contentRef}
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={handleBlur}
+                onFocus={handleFocus}
+                onKeyDown={handleKeyDown}
+                className={`
+                    ${className} 
+                    outline-none 
+                    relative
+                    ${isEmpty && !isFocused ? 'text-gray-400' : ''}
+                `}
+                style={{ 
+                    ...style, 
+                    cursor: 'text',
+                    display: 'inline-block',
+                    minWidth: '20px',
+                    boxSizing: 'border-box',
+                    whiteSpace: multiline ? 'pre-wrap' : 'nowrap',
+                    wordWrap: multiline ? 'break-word' : 'normal',
+                }}
+                data-placeholder={placeholder}
+            >
+                {displayValue || (isFocused ? '' : placeholder)}
+            </Tag>
+        </div>
     );
 };
