@@ -425,6 +425,15 @@ function EditorContent() {
 
           <div className="flex-1 overflow-y-auto py-2">
             <SidebarItem
+              icon={Layout}
+              label="Templates"
+              sublabel="Change layout"
+              collapsed={sidebarCollapsed}
+              onClick={() => toggleDrawer("templates")}
+              isActive={activeDrawer === "templates"}
+            />
+
+            <SidebarItem
               icon={Palette}
               label="Design & Fonts"
               sublabel="Customize look"
