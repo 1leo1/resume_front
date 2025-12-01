@@ -18,7 +18,7 @@ export default function LoginPage() {
         setTimeout(() => setIsLoading(false), 2000)
     }
 
-    const handleSocialLogin = async (provider: 'github' | 'linkedin') => {
+    const handleSocialLogin = async (provider: 'github' | 'linkedin_oidc') => {
         const supabase = createClient()
         await supabase.auth.signInWithOAuth({
             provider,
@@ -89,7 +89,7 @@ export default function LoginPage() {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => handleSocialLogin('linkedin')}
+                                onClick={() => handleSocialLogin('linkedin_oidc')}
                                 className="flex items-center justify-center py-2.5 border border-gray-200 rounded-xl hover:bg-gray-100 hover:shadow-sm transition-all cursor-pointer dark:border-gray-800 dark:hover:bg-gray-800"
                             >
                                 <Linkedin className="w-5 h-5 text-[#0077b5]" />
