@@ -63,7 +63,7 @@ export default function Navbar() {
                   Dashboard
                 </Link>
                 <form action={signout}>
-                  <button type="submit" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+                  <button type="submit" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors cursor-pointer">
                     Sign Out
                   </button>
                 </form>
@@ -116,7 +116,7 @@ export default function Navbar() {
                     Dashboard
                   </Link>
                   <form action={signout}>
-                    <button type="submit" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors">
+                    <button type="submit" className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors cursor-pointer">
                       Sign Out
                     </button>
                   </form>

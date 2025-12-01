@@ -22,7 +22,7 @@ export default function LoginPage() {
         await supabase.auth.signInWithOAuth({
             provider,
             options: {
-                redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://claycv.com'}/auth/callback`,
+                redirectTo: 'https://claycv.com/auth/callback',
             },
         })
     }
