@@ -17,40 +17,26 @@ DELETE FROM templates WHERE slug IN (
   'marketing-pro'
 );
 
--- ============================================================================
--- TEMPLATE 1: Modern Professional
--- Best for: All industries (universal template)
--- Layout: Two-column with left sidebar
--- ============================================================================
-INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, dummy_data, is_premium) VALUES
-(
-  'modern-professional',
-  'Modern Professional',
-  'A sleek, contemporary design perfect for professionals across all industries. Features a balanced two-column layout with clean typography and strategic use of color accents.',
-  '["tech", "business", "marketing", "healthcare", "creative", "education", "legal", "other"]',
-  '["modern", "professional", "clean", "ats-friendly", "versatile"]',
-  $structure${
-    "layout": {
-      "type": "two-column",
-      "columns": [
-        {"width": "35%", "sections": ["skills", "education", "languages", "awards"]},
-        {"width": "65%", "sections": ["header", "summary", "work", "projects"]}
-      ]
-    },
-    "sections": {
-      "header": {"id": "header", "type": "header", "title": "Profile"},
-      "summary": {"id": "summary", "type": "summary", "title": "Professional Summary"},
-      "work": {"id": "work", "type": "work", "title": "Work Experience"},
-      "education": {"id": "education", "type": "education", "title": "Education"},
-      "skills": {"id": "skills", "type": "skills", "title": "Skills"},
-      "projects": {"id": "projects", "type": "projects", "title": "Projects"},
-      "languages": {"id": "languages", "type": "languages", "title": "Languages"},
-      "awards": {"id": "awards", "type": "awards", "title": "Achievements"}
-    }
-  }$structure$,
-  '{"primary": "#2563eb", "accent": "#dbeafe", "font": "inter"}',
-  NULL,
-  $data${
+
+-- Create table for dummy data
+CREATE TABLE IF NOT EXISTS template_dummy_data (
+    id SERIAL PRIMARY KEY,
+    template_slug TEXT NOT NULL REFERENCES templates(slug) ON DELETE CASCADE,
+    industry TEXT NOT NULL,
+    data JSONB NOT NULL,
+    UNIQUE(template_slug, industry)
+);
+
+CREATE INDEX IF NOT EXISTS idx_template_dummy_data_slug_industry ON template_dummy_data(template_slug, industry);
+
+-- Create temp table for source data
+CREATE TEMP TABLE temp_source_data (
+    slug TEXT,
+    dummy_data JSONB
+);
+
+INSERT INTO temp_source_data (slug, dummy_data) VALUES
+('modern-professional', $data${
     "basics": {
       "name": "Jordan Mitchell",
       "label": "Product Manager",
@@ -127,43 +113,8 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
     "volunteer": [],
     "references": [],
     "publications": []
-  }$data$,
-  false
-);
-
--- ============================================================================
--- TEMPLATE 2: Executive Suite
--- Best for: Business, Legal, Healthcare, Education leadership
--- Layout: Elegant two-column with emphasis on leadership
--- ============================================================================
-INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, dummy_data, is_premium) VALUES
-(
-  'executive-suite',
-  'Executive Suite',
-  'Sophisticated and elegant layout designed for C-level executives and senior leaders. Features a refined two-column design with emphasis on leadership achievements and strategic impact.',
-  '["business", "legal", "healthcare", "education", "tech", "marketing", "other"]',
-  '["elegant", "professional", "premium", "sophisticated", "leadership"]',
-  $structure${
-    "layout": {
-      "type": "two-column",
-      "columns": [
-        {"width": "32%", "sections": ["skills", "languages", "awards"]},
-        {"width": "68%", "sections": ["header", "summary", "work", "education"]}
-      ]
-    },
-    "sections": {
-      "header": {"id": "header", "type": "header", "title": "Executive Profile"},
-      "summary": {"id": "summary", "type": "summary", "title": "Executive Summary"},
-      "work": {"id": "work", "type": "work", "title": "Leadership Experience"},
-      "education": {"id": "education", "type": "education", "title": "Education & Credentials"},
-      "skills": {"id": "skills", "type": "skills", "title": "Core Competencies"},
-      "languages": {"id": "languages", "type": "languages", "title": "Languages"},
-      "awards": {"id": "awards", "type": "awards", "title": "Honors & Recognition"}
-    }
-  }$structure$,
-  '{"primary": "#1e293b", "accent": "#f1f5f9", "font": "georgia"}',
-  NULL,
-  $data${
+  }$data$),
+('executive-suite', $data${
     "basics": {
       "name": "Victoria Sterling",
       "label": "Chief Executive Officer",
@@ -232,44 +183,8 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
     "volunteer": [],
     "references": [],
     "publications": []
-  }$data$,
-  true
-);
-
--- ============================================================================
--- TEMPLATE 3: Creative Portfolio
--- Best for: Creative, Marketing, Tech (design roles)
--- Layout: Bold asymmetric two-column design
--- ============================================================================
-INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, dummy_data, is_premium) VALUES
-(
-  'creative-portfolio',
-  'Creative Portfolio',
-  'Bold and visually striking layout designed for creative professionals, designers, and artists. Features a modern asymmetric design with space for showcasing creative work and awards.',
-  '["creative", "marketing", "tech", "other"]',
-  '["bold", "modern", "creative", "visual", "artistic", "portfolio"]',
-  $structure${
-    "layout": {
-      "type": "two-column",
-      "columns": [
-        {"width": "38%", "sections": ["skills", "languages", "awards"]},
-        {"width": "62%", "sections": ["header", "summary", "work", "projects", "education"]}
-      ]
-    },
-    "sections": {
-      "header": {"id": "header", "type": "header", "title": "Creative Profile"},
-      "summary": {"id": "summary", "type": "summary", "title": "Creative Vision"},
-      "work": {"id": "work", "type": "work", "title": "Experience"},
-      "projects": {"id": "projects", "type": "projects", "title": "Featured Work"},
-      "education": {"id": "education", "type": "education", "title": "Education"},
-      "skills": {"id": "skills", "type": "skills", "title": "Expertise"},
-      "languages": {"id": "languages", "type": "languages", "title": "Languages"},
-      "awards": {"id": "awards", "type": "awards", "title": "Recognition"}
-    }
-  }$structure$,
-  '{"primary": "#7c3aed", "accent": "#ede9fe", "font": "inter"}',
-  NULL,
-  $data${
+  }$data$),
+('creative-portfolio', $data${
     "basics": {
       "name": "Maya Rodriguez",
       "label": "Senior Creative Director",
@@ -355,43 +270,8 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
     "volunteer": [],
     "references": [],
     "publications": []
-  }$data$,
-  true
-);
-
--- ============================================================================
--- TEMPLATE 4: Academic Scholar
--- Best for: Education, Healthcare (research), Legal (academic)
--- Layout: Single-column with clear academic structure
--- ============================================================================
-INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, dummy_data, is_premium) VALUES
-(
-  'academic-scholar',
-  'Academic Scholar',
-  'Structured and comprehensive layout designed for academics, researchers, and educators. Emphasizes publications, research, and teaching experience with clear section organization.',
-  '["education", "healthcare", "legal", "tech", "other"]',
-  '["scholarly", "structured", "comprehensive", "academic", "research"]',
-  $structure${
-    "layout": {
-      "type": "single-column",
-      "columns": [
-        {"width": "100%", "sections": ["header", "summary", "education", "work", "projects", "awards", "skills", "languages"]}
-      ]
-    },
-    "sections": {
-      "header": {"id": "header", "type": "header", "title": "Academic Profile"},
-      "summary": {"id": "summary", "type": "summary", "title": "Research Interests"},
-      "education": {"id": "education", "type": "education", "title": "Education"},
-      "work": {"id": "work", "type": "work", "title": "Academic Positions"},
-      "projects": {"id": "projects", "type": "projects", "title": "Research & Publications"},
-      "awards": {"id": "awards", "type": "awards", "title": "Grants & Awards"},
-      "skills": {"id": "skills", "type": "skills", "title": "Research Methods & Tools"},
-      "languages": {"id": "languages", "type": "languages", "title": "Languages"}
-    }
-  }$structure$,
-  '{"primary": "#0369a1", "accent": "#e0f2fe", "font": "georgia"}',
-  NULL,
-  $data${
+  }$data$),
+('academic-scholar', $data${
     "basics": {
       "name": "Dr. James Chen",
       "label": "Associate Professor of Computer Science",
@@ -476,41 +356,8 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
     "volunteer": [],
     "references": [],
     "publications": []
-  }$data$,
-  true
-);
-
--- ============================================================================
--- TEMPLATE 5: Minimal ATS
--- Best for: All industries (universal ATS-optimized)
--- Layout: Clean single-column, highly ATS-compatible
--- ============================================================================
-INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, dummy_data, is_premium) VALUES
-(
-  'minimal-ats',
-  'Minimal ATS',
-  'Clean, simple, and highly readable layout optimized for Applicant Tracking Systems (ATS). Features a single-column design with clear section headers and standard formatting that parses perfectly.',
-  '["tech", "business", "marketing", "healthcare", "creative", "education", "legal", "other"]',
-  '["minimal", "ats-friendly", "clean", "simple", "optimized", "universal"]',
-  $structure${
-    "layout": {
-      "type": "single-column",
-      "columns": [
-        {"width": "100%", "sections": ["header", "summary", "work", "skills", "education", "projects"]}
-      ]
-    },
-    "sections": {
-      "header": {"id": "header", "type": "header", "title": "Contact"},
-      "summary": {"id": "summary", "type": "summary", "title": "Professional Summary"},
-      "work": {"id": "work", "type": "work", "title": "Work Experience"},
-      "skills": {"id": "skills", "type": "skills", "title": "Skills"},
-      "education": {"id": "education", "type": "education", "title": "Education"},
-      "projects": {"id": "projects", "type": "projects", "title": "Projects"}
-    }
-  }$structure$,
-  '{"primary": "#111827", "accent": "#f3f4f6", "font": "inter"}',
-  NULL,
-  $data${
+  }$data$),
+('minimal-ats', $data${
     "basics": {
       "name": "Michael Thompson",
       "label": "Full Stack Software Engineer",
@@ -586,44 +433,8 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
     "volunteer": [],
     "references": [],
     "publications": []
-  }$data$,
-  false
-);
-
--- ============================================================================
--- TEMPLATE 6: Healthcare Professional
--- Best for: Healthcare, Education (medical)
--- Layout: Two-column with clinical focus
--- ============================================================================
-INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, dummy_data, is_premium) VALUES
-(
-  'healthcare-professional',
-  'Healthcare Professional',
-  'Professional and trustworthy layout designed for doctors, nurses, and healthcare professionals. Features clear organization of credentials, clinical experience, and certifications.',
-  '["healthcare", "education", "other"]',
-  '["professional", "medical", "clinical", "trustworthy", "credentials"]',
-  $structure${
-    "layout": {
-      "type": "two-column",
-      "columns": [
-        {"width": "35%", "sections": ["skills", "languages", "awards"]},
-        {"width": "65%", "sections": ["header", "summary", "work", "education", "volunteer"]}
-      ]
-    },
-    "sections": {
-      "header": {"id": "header", "type": "header", "title": "Professional Profile"},
-      "summary": {"id": "summary", "type": "summary", "title": "Professional Summary"},
-      "work": {"id": "work", "type": "work", "title": "Clinical Experience"},
-      "education": {"id": "education", "type": "education", "title": "Education & Training"},
-      "skills": {"id": "skills", "type": "skills", "title": "Clinical Competencies"},
-      "languages": {"id": "languages", "type": "languages", "title": "Languages"},
-      "awards": {"id": "awards", "type": "awards", "title": "Certifications & Licenses"},
-      "volunteer": {"id": "volunteer", "type": "volunteer", "title": "Community Service"}
-    }
-  }$structure$,
-  '{"primary": "#0891b2", "accent": "#ecfeff", "font": "inter"}',
-  NULL,
-  $data${
+  }$data$),
+('healthcare-professional', $data${
     "basics": {
       "name": "Dr. Sarah Mitchell, MD",
       "label": "Board-Certified Internal Medicine Physician",
@@ -711,42 +522,8 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
     "projects": [],
     "references": [],
     "publications": []
-  }$data$,
-  true
-);
-
--- ============================================================================
--- TEMPLATE 7: Legal Excellence
--- Best for: Legal, Business
--- Layout: Traditional single-column with formal styling
--- ============================================================================
-INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, dummy_data, is_premium) VALUES
-(
-  'legal-excellence',
-  'Legal Excellence',
-  'Formal and authoritative layout designed for attorneys, paralegals, and legal professionals. Features traditional typography and structured presentation of cases, publications, and bar admissions.',
-  '["legal", "business", "education", "other"]',
-  '["formal", "traditional", "authoritative", "professional", "legal"]',
-  $structure${
-    "layout": {
-      "type": "single-column",
-      "columns": [
-        {"width": "100%", "sections": ["header", "summary", "work", "education", "awards", "skills", "languages"]}
-      ]
-    },
-    "sections": {
-      "header": {"id": "header", "type": "header", "title": "Attorney Profile"},
-      "summary": {"id": "summary", "type": "summary", "title": "Professional Summary"},
-      "work": {"id": "work", "type": "work", "title": "Legal Experience"},
-      "education": {"id": "education", "type": "education", "title": "Education"},
-      "awards": {"id": "awards", "type": "awards", "title": "Bar Admissions & Certifications"},
-      "skills": {"id": "skills", "type": "skills", "title": "Practice Areas"},
-      "languages": {"id": "languages", "type": "languages", "title": "Languages"}
-    }
-  }$structure$,
-  '{"primary": "#334155", "accent": "#f1f5f9", "font": "georgia"}',
-  NULL,
-  $data${
+  }$data$),
+('legal-excellence', $data${
     "basics": {
       "name": "Alexandra Bennett, Esq.",
       "label": "Senior Partner - Corporate Law",
@@ -819,41 +596,8 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
     "volunteer": [],
     "references": [],
     "publications": []
-  }$data$,
-  true
-);
-
--- ============================================================================
--- TEMPLATE 8: Classic Business
--- Best for: Business, Education, Legal
--- Layout: Traditional single-column with serif fonts
--- ============================================================================
-INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, dummy_data, is_premium) VALUES
-(
-  'classic-business',
-  'Classic Business',
-  'Timeless and refined layout for business professionals. Features traditional typography and balanced structure that conveys professionalism and reliability.',
-  '["business", "education", "legal", "marketing", "other"]',
-  '["classic", "traditional", "professional", "business", "refined"]',
-  $structure${
-    "layout": {
-      "type": "single-column",
-      "columns": [
-        {"width": "100%", "sections": ["header", "summary", "work", "education", "skills", "awards"]}
-      ]
-    },
-    "sections": {
-      "header": {"id": "header", "type": "header", "title": "Profile"},
-      "summary": {"id": "summary", "type": "summary", "title": "Executive Summary"},
-      "work": {"id": "work", "type": "work", "title": "Professional Experience"},
-      "education": {"id": "education", "type": "education", "title": "Education"},
-      "skills": {"id": "skills", "type": "skills", "title": "Core Competencies"},
-      "awards": {"id": "awards", "type": "awards", "title": "Certifications & Awards"}
-    }
-  }$structure$,
-  '{"primary": "#374151", "accent": "#e5e7eb", "font": "georgia"}',
-  NULL,
-  $data${
+  }$data$),
+('classic-business', $data${
     "basics": {
       "name": "Robert Harrison",
       "label": "Senior Financial Analyst",
@@ -924,44 +668,8 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
     "volunteer": [],
     "references": [],
     "publications": []
-  }$data$,
-  false
-);
-
--- ============================================================================
--- TEMPLATE 9: Tech Innovator
--- Best for: Technology, Creative (UX/UI)
--- Layout: Modern two-column with tech focus
--- ============================================================================
-INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, dummy_data, is_premium) VALUES
-(
-  'tech-innovator',
-  'Tech Innovator',
-  'Dynamic and modern layout designed for software engineers, developers, and tech professionals. Emphasizes technical skills, projects, and contributions to open source.',
-  '["tech", "creative"]',
-  '["modern", "technical", "developer", "startup", "innovative"]',
-  $structure${
-    "layout": {
-      "type": "two-column",
-      "columns": [
-        {"width": "35%", "sections": ["skills", "education", "languages", "awards"]},
-        {"width": "65%", "sections": ["header", "summary", "work", "projects"]}
-      ]
-    },
-    "sections": {
-      "header": {"id": "header", "type": "header", "title": "Developer Profile"},
-      "summary": {"id": "summary", "type": "summary", "title": "About Me"},
-      "work": {"id": "work", "type": "work", "title": "Experience"},
-      "projects": {"id": "projects", "type": "projects", "title": "Projects & Open Source"},
-      "education": {"id": "education", "type": "education", "title": "Education"},
-      "skills": {"id": "skills", "type": "skills", "title": "Tech Stack"},
-      "languages": {"id": "languages", "type": "languages", "title": "Languages"},
-      "awards": {"id": "awards", "type": "awards", "title": "Certifications"}
-    }
-  }$structure$,
-  '{"primary": "#0ea5e9", "accent": "#e0f2fe", "font": "inter"}',
-  NULL,
-  $data${
+  }$data$),
+('tech-innovator', $data${
     "basics": {
       "name": "Alex Rivera",
       "label": "Staff Software Engineer",
@@ -1048,44 +756,8 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
     "volunteer": [],
     "references": [],
     "publications": []
-  }$data$,
-  false
-);
-
--- ============================================================================
--- TEMPLATE 10: Marketing Pro
--- Best for: Marketing, Business, Creative
--- Layout: Vibrant two-column with results focus
--- ============================================================================
-INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, dummy_data, is_premium) VALUES
-(
-  'marketing-pro',
-  'Marketing Pro',
-  'Dynamic and results-driven layout designed for marketing and sales professionals. Emphasizes campaign results, metrics, and business impact with a modern visual style.',
-  '["marketing", "business", "creative", "other"]',
-  '["dynamic", "results-driven", "marketing", "sales", "modern"]',
-  $structure${
-    "layout": {
-      "type": "two-column",
-      "columns": [
-        {"width": "35%", "sections": ["skills", "awards", "languages"]},
-        {"width": "65%", "sections": ["header", "summary", "work", "projects", "education"]}
-      ]
-    },
-    "sections": {
-      "header": {"id": "header", "type": "header", "title": "Marketing Profile"},
-      "summary": {"id": "summary", "type": "summary", "title": "Professional Summary"},
-      "work": {"id": "work", "type": "work", "title": "Experience"},
-      "projects": {"id": "projects", "type": "projects", "title": "Key Campaigns"},
-      "education": {"id": "education", "type": "education", "title": "Education"},
-      "skills": {"id": "skills", "type": "skills", "title": "Marketing Skills"},
-      "awards": {"id": "awards", "type": "awards", "title": "Certifications"},
-      "languages": {"id": "languages", "type": "languages", "title": "Languages"}
-    }
-  }$structure$,
-  '{"primary": "#ea580c", "accent": "#fff7ed", "font": "inter"}',
-  NULL,
-  $data${
+  }$data$),
+('marketing-pro', $data${
     "basics": {
       "name": "Emily Chen",
       "label": "VP of Marketing",
@@ -1170,7 +842,364 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
     "volunteer": [],
     "references": [],
     "publications": []
-  }$data$,
+  }$data$);
+
+-- ============================================================================
+-- TEMPLATE 1: Modern Professional
+-- Best for: All industries (universal template)
+-- Layout: Two-column with left sidebar
+-- ============================================================================
+INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, is_premium) VALUES
+(
+  'modern-professional',
+  'Modern Professional',
+  'A sleek, contemporary design perfect for professionals across all industries. Features a balanced two-column layout with clean typography and strategic use of color accents.',
+  '["tech", "business", "marketing", "healthcare", "creative", "education", "legal", "other"]',
+  '["modern", "professional", "clean", "ats-friendly", "versatile"]',
+  $structure${
+    "layout": {
+      "type": "two-column",
+      "columns": [
+        {"width": "35%", "sections": ["skills", "education", "languages", "awards"]},
+        {"width": "65%", "sections": ["header", "summary", "work", "projects"]}
+      ]
+    },
+    "sections": {
+      "header": {"id": "header", "type": "header", "title": "Profile"},
+      "summary": {"id": "summary", "type": "summary", "title": "Professional Summary"},
+      "work": {"id": "work", "type": "work", "title": "Work Experience"},
+      "education": {"id": "education", "type": "education", "title": "Education"},
+      "skills": {"id": "skills", "type": "skills", "title": "Skills"},
+      "projects": {"id": "projects", "type": "projects", "title": "Projects"},
+      "languages": {"id": "languages", "type": "languages", "title": "Languages"},
+      "awards": {"id": "awards", "type": "awards", "title": "Achievements"}
+    }
+  }$structure$,
+  '{"primary": "#2563eb", "accent": "#dbeafe", "font": "inter"}',
+  NULL,
+  false
+);
+
+-- ============================================================================
+-- TEMPLATE 2: Executive Suite
+-- Best for: Business, Legal, Healthcare, Education leadership
+-- Layout: Elegant two-column with emphasis on leadership
+-- ============================================================================
+
+INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, is_premium) VALUES
+(
+  'executive-suite',
+  'Executive Suite',
+  'Sophisticated and elegant layout designed for C-level executives and senior leaders. Features a refined two-column design with emphasis on leadership achievements and strategic impact.',
+  '["business", "legal", "healthcare", "education", "tech", "marketing", "other"]',
+  '["elegant", "professional", "premium", "sophisticated", "leadership"]',
+  $structure${
+    "layout": {
+      "type": "two-column",
+      "columns": [
+        {"width": "32%", "sections": ["skills", "languages", "awards"]},
+        {"width": "68%", "sections": ["header", "summary", "work", "education"]}
+      ]
+    },
+    "sections": {
+      "header": {"id": "header", "type": "header", "title": "Executive Profile"},
+      "summary": {"id": "summary", "type": "summary", "title": "Executive Summary"},
+      "work": {"id": "work", "type": "work", "title": "Leadership Experience"},
+      "education": {"id": "education", "type": "education", "title": "Education & Credentials"},
+      "skills": {"id": "skills", "type": "skills", "title": "Core Competencies"},
+      "languages": {"id": "languages", "type": "languages", "title": "Languages"},
+      "awards": {"id": "awards", "type": "awards", "title": "Honors & Recognition"}
+    }
+  }$structure$,
+  '{"primary": "#1e293b", "accent": "#f1f5f9", "font": "georgia"}',
+  NULL,
+  true
+);
+
+-- ============================================================================
+-- TEMPLATE 3: Creative Portfolio
+-- Best for: Creative, Marketing, Tech (design roles)
+-- Layout: Bold asymmetric two-column design
+-- ============================================================================
+
+INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, is_premium) VALUES
+(
+  'creative-portfolio',
+  'Creative Portfolio',
+  'Bold and visually striking layout designed for creative professionals, designers, and artists. Features a modern asymmetric design with space for showcasing creative work and awards.',
+  '["creative", "marketing", "tech", "other"]',
+  '["bold", "modern", "creative", "visual", "artistic", "portfolio"]',
+  $structure${
+    "layout": {
+      "type": "two-column",
+      "columns": [
+        {"width": "38%", "sections": ["skills", "languages", "awards"]},
+        {"width": "62%", "sections": ["header", "summary", "work", "projects", "education"]}
+      ]
+    },
+    "sections": {
+      "header": {"id": "header", "type": "header", "title": "Creative Profile"},
+      "summary": {"id": "summary", "type": "summary", "title": "Creative Vision"},
+      "work": {"id": "work", "type": "work", "title": "Experience"},
+      "projects": {"id": "projects", "type": "projects", "title": "Featured Work"},
+      "education": {"id": "education", "type": "education", "title": "Education"},
+      "skills": {"id": "skills", "type": "skills", "title": "Expertise"},
+      "languages": {"id": "languages", "type": "languages", "title": "Languages"},
+      "awards": {"id": "awards", "type": "awards", "title": "Recognition"}
+    }
+  }$structure$,
+  '{"primary": "#7c3aed", "accent": "#ede9fe", "font": "inter"}',
+  NULL,
+  true
+);
+
+-- ============================================================================
+-- TEMPLATE 4: Academic Scholar
+-- Best for: Education, Healthcare (research), Legal (academic)
+-- Layout: Single-column with clear academic structure
+-- ============================================================================
+
+INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, is_premium) VALUES
+(
+  'academic-scholar',
+  'Academic Scholar',
+  'Structured and comprehensive layout designed for academics, researchers, and educators. Emphasizes publications, research, and teaching experience with clear section organization.',
+  '["education", "healthcare", "legal", "tech", "other"]',
+  '["scholarly", "structured", "comprehensive", "academic", "research"]',
+  $structure${
+    "layout": {
+      "type": "single-column",
+      "columns": [
+        {"width": "100%", "sections": ["header", "summary", "education", "work", "projects", "awards", "skills", "languages"]}
+      ]
+    },
+    "sections": {
+      "header": {"id": "header", "type": "header", "title": "Academic Profile"},
+      "summary": {"id": "summary", "type": "summary", "title": "Research Interests"},
+      "education": {"id": "education", "type": "education", "title": "Education"},
+      "work": {"id": "work", "type": "work", "title": "Academic Positions"},
+      "projects": {"id": "projects", "type": "projects", "title": "Research & Publications"},
+      "awards": {"id": "awards", "type": "awards", "title": "Grants & Awards"},
+      "skills": {"id": "skills", "type": "skills", "title": "Research Methods & Tools"},
+      "languages": {"id": "languages", "type": "languages", "title": "Languages"}
+    }
+  }$structure$,
+  '{"primary": "#0369a1", "accent": "#e0f2fe", "font": "georgia"}',
+  NULL,
+  true
+);
+
+-- ============================================================================
+-- TEMPLATE 5: Minimal ATS
+-- Best for: All industries (universal ATS-optimized)
+-- Layout: Clean single-column, highly ATS-compatible
+-- ============================================================================
+
+INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, is_premium) VALUES
+(
+  'minimal-ats',
+  'Minimal ATS',
+  'Clean, simple, and highly readable layout optimized for Applicant Tracking Systems (ATS). Features a single-column design with clear section headers and standard formatting that parses perfectly.',
+  '["tech", "business", "marketing", "healthcare", "creative", "education", "legal", "other"]',
+  '["minimal", "ats-friendly", "clean", "simple", "optimized", "universal"]',
+  $structure${
+    "layout": {
+      "type": "single-column",
+      "columns": [
+        {"width": "100%", "sections": ["header", "summary", "work", "skills", "education", "projects"]}
+      ]
+    },
+    "sections": {
+      "header": {"id": "header", "type": "header", "title": "Contact"},
+      "summary": {"id": "summary", "type": "summary", "title": "Professional Summary"},
+      "work": {"id": "work", "type": "work", "title": "Work Experience"},
+      "skills": {"id": "skills", "type": "skills", "title": "Skills"},
+      "education": {"id": "education", "type": "education", "title": "Education"},
+      "projects": {"id": "projects", "type": "projects", "title": "Projects"}
+    }
+  }$structure$,
+  '{"primary": "#111827", "accent": "#f3f4f6", "font": "inter"}',
+  NULL,
+  false
+);
+
+-- ============================================================================
+-- TEMPLATE 6: Healthcare Professional
+-- Best for: Healthcare, Education (medical)
+-- Layout: Two-column with clinical focus
+-- ============================================================================
+
+INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, is_premium) VALUES
+(
+  'healthcare-professional',
+  'Healthcare Professional',
+  'Professional and trustworthy layout designed for doctors, nurses, and healthcare professionals. Features clear organization of credentials, clinical experience, and certifications.',
+  '["healthcare", "education", "other"]',
+  '["professional", "medical", "clinical", "trustworthy", "credentials"]',
+  $structure${
+    "layout": {
+      "type": "two-column",
+      "columns": [
+        {"width": "35%", "sections": ["skills", "languages", "awards"]},
+        {"width": "65%", "sections": ["header", "summary", "work", "education", "volunteer"]}
+      ]
+    },
+    "sections": {
+      "header": {"id": "header", "type": "header", "title": "Professional Profile"},
+      "summary": {"id": "summary", "type": "summary", "title": "Professional Summary"},
+      "work": {"id": "work", "type": "work", "title": "Clinical Experience"},
+      "education": {"id": "education", "type": "education", "title": "Education & Training"},
+      "skills": {"id": "skills", "type": "skills", "title": "Clinical Competencies"},
+      "languages": {"id": "languages", "type": "languages", "title": "Languages"},
+      "awards": {"id": "awards", "type": "awards", "title": "Certifications & Licenses"},
+      "volunteer": {"id": "volunteer", "type": "volunteer", "title": "Community Service"}
+    }
+  }$structure$,
+  '{"primary": "#0891b2", "accent": "#ecfeff", "font": "inter"}',
+  NULL,
+  true
+);
+
+-- ============================================================================
+-- TEMPLATE 7: Legal Excellence
+-- Best for: Legal, Business
+-- Layout: Traditional single-column with formal styling
+-- ============================================================================
+
+INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, is_premium) VALUES
+(
+  'legal-excellence',
+  'Legal Excellence',
+  'Formal and authoritative layout designed for attorneys, paralegals, and legal professionals. Features traditional typography and structured presentation of cases, publications, and bar admissions.',
+  '["legal", "business", "education", "other"]',
+  '["formal", "traditional", "authoritative", "professional", "legal"]',
+  $structure${
+    "layout": {
+      "type": "single-column",
+      "columns": [
+        {"width": "100%", "sections": ["header", "summary", "work", "education", "awards", "skills", "languages"]}
+      ]
+    },
+    "sections": {
+      "header": {"id": "header", "type": "header", "title": "Attorney Profile"},
+      "summary": {"id": "summary", "type": "summary", "title": "Professional Summary"},
+      "work": {"id": "work", "type": "work", "title": "Legal Experience"},
+      "education": {"id": "education", "type": "education", "title": "Education"},
+      "awards": {"id": "awards", "type": "awards", "title": "Bar Admissions & Certifications"},
+      "skills": {"id": "skills", "type": "skills", "title": "Practice Areas"},
+      "languages": {"id": "languages", "type": "languages", "title": "Languages"}
+    }
+  }$structure$,
+  '{"primary": "#334155", "accent": "#f1f5f9", "font": "georgia"}',
+  NULL,
+  true
+);
+
+-- ============================================================================
+-- TEMPLATE 8: Classic Business
+-- Best for: Business, Education, Legal
+-- Layout: Traditional single-column with serif fonts
+-- ============================================================================
+
+INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, is_premium) VALUES
+(
+  'classic-business',
+  'Classic Business',
+  'Timeless and refined layout for business professionals. Features traditional typography and balanced structure that conveys professionalism and reliability.',
+  '["business", "education", "legal", "marketing", "other"]',
+  '["classic", "traditional", "professional", "business", "refined"]',
+  $structure${
+    "layout": {
+      "type": "single-column",
+      "columns": [
+        {"width": "100%", "sections": ["header", "summary", "work", "education", "skills", "awards"]}
+      ]
+    },
+    "sections": {
+      "header": {"id": "header", "type": "header", "title": "Profile"},
+      "summary": {"id": "summary", "type": "summary", "title": "Executive Summary"},
+      "work": {"id": "work", "type": "work", "title": "Professional Experience"},
+      "education": {"id": "education", "type": "education", "title": "Education"},
+      "skills": {"id": "skills", "type": "skills", "title": "Core Competencies"},
+      "awards": {"id": "awards", "type": "awards", "title": "Certifications & Awards"}
+    }
+  }$structure$,
+  '{"primary": "#374151", "accent": "#e5e7eb", "font": "georgia"}',
+  NULL,
+  false
+);
+
+-- ============================================================================
+-- TEMPLATE 9: Tech Innovator
+-- Best for: Technology, Creative (UX/UI)
+-- Layout: Modern two-column with tech focus
+-- ============================================================================
+
+INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, is_premium) VALUES
+(
+  'tech-innovator',
+  'Tech Innovator',
+  'Dynamic and modern layout designed for software engineers, developers, and tech professionals. Emphasizes technical skills, projects, and contributions to open source.',
+  '["tech", "creative"]',
+  '["modern", "technical", "developer", "startup", "innovative"]',
+  $structure${
+    "layout": {
+      "type": "two-column",
+      "columns": [
+        {"width": "35%", "sections": ["skills", "education", "languages", "awards"]},
+        {"width": "65%", "sections": ["header", "summary", "work", "projects"]}
+      ]
+    },
+    "sections": {
+      "header": {"id": "header", "type": "header", "title": "Developer Profile"},
+      "summary": {"id": "summary", "type": "summary", "title": "About Me"},
+      "work": {"id": "work", "type": "work", "title": "Experience"},
+      "projects": {"id": "projects", "type": "projects", "title": "Projects & Open Source"},
+      "education": {"id": "education", "type": "education", "title": "Education"},
+      "skills": {"id": "skills", "type": "skills", "title": "Tech Stack"},
+      "languages": {"id": "languages", "type": "languages", "title": "Languages"},
+      "awards": {"id": "awards", "type": "awards", "title": "Certifications"}
+    }
+  }$structure$,
+  '{"primary": "#0ea5e9", "accent": "#e0f2fe", "font": "inter"}',
+  NULL,
+  false
+);
+
+-- ============================================================================
+-- TEMPLATE 10: Marketing Pro
+-- Best for: Marketing, Business, Creative
+-- Layout: Vibrant two-column with results focus
+-- ============================================================================
+
+INSERT INTO templates (slug, name, description, industry, tags, structure, styles, thumbnail_url, is_premium) VALUES
+(
+  'marketing-pro',
+  'Marketing Pro',
+  'Dynamic and results-driven layout designed for marketing and sales professionals. Emphasizes campaign results, metrics, and business impact with a modern visual style.',
+  '["marketing", "business", "creative", "other"]',
+  '["dynamic", "results-driven", "marketing", "sales", "modern"]',
+  $structure${
+    "layout": {
+      "type": "two-column",
+      "columns": [
+        {"width": "35%", "sections": ["skills", "awards", "languages"]},
+        {"width": "65%", "sections": ["header", "summary", "work", "projects", "education"]}
+      ]
+    },
+    "sections": {
+      "header": {"id": "header", "type": "header", "title": "Marketing Profile"},
+      "summary": {"id": "summary", "type": "summary", "title": "Professional Summary"},
+      "work": {"id": "work", "type": "work", "title": "Experience"},
+      "projects": {"id": "projects", "type": "projects", "title": "Key Campaigns"},
+      "education": {"id": "education", "type": "education", "title": "Education"},
+      "skills": {"id": "skills", "type": "skills", "title": "Marketing Skills"},
+      "awards": {"id": "awards", "type": "awards", "title": "Certifications"},
+      "languages": {"id": "languages", "type": "languages", "title": "Languages"}
+    }
+  }$structure$,
+  '{"primary": "#ea580c", "accent": "#fff7ed", "font": "inter"}',
+  NULL,
   true
 );
 
@@ -1218,3 +1247,26 @@ INSERT INTO templates (slug, name, description, industry, tags, structure, style
 -- via the "Design & Fonts" panel. The layout type in the template structure
 -- serves as the default starting point.
 -- ============================================================================
+
+-- Populate template_dummy_data from temp_source_data
+WITH industry_map AS (
+    SELECT 'tech' as industry, 'tech-innovator' as source_slug UNION ALL
+    SELECT 'business', 'classic-business' UNION ALL
+    SELECT 'healthcare', 'healthcare-professional' UNION ALL
+    SELECT 'creative', 'creative-portfolio' UNION ALL
+    SELECT 'education', 'academic-scholar' UNION ALL
+    SELECT 'legal', 'legal-excellence' UNION ALL
+    SELECT 'marketing', 'marketing-pro' UNION ALL
+    SELECT 'other', 'modern-professional'
+)
+INSERT INTO template_dummy_data (template_slug, industry, data)
+SELECT 
+    t.slug,
+    im.industry,
+    sd.dummy_data
+FROM templates t
+CROSS JOIN industry_map im
+JOIN temp_source_data sd ON sd.slug = im.source_slug;
+
+-- Drop Temp Table
+DROP TABLE temp_source_data;
