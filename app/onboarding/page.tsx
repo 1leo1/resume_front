@@ -25,6 +25,7 @@ import {
   Rocket,
 } from "lucide-react";
 import { Template } from "@/types/resume";
+import TemplateThumbnail from "@/components/TemplateThumbnail";
 
 const industries = [
   { id: "tech", name: "Technology", icon: Code, color: "blue" },
@@ -392,28 +393,29 @@ export default function OnboardingPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
                         onClick={() => handleTemplateSelect(template)}
-                        className={`group relative rounded-2xl overflow-hidden border-2 transition-all ${selectedTemplate?.id === template.id
+                        className={`group relative rounded-2xl overflow-hidden border-2 transition-all bg-white dark:bg-gray-800 ${selectedTemplate?.id === template.id
                           ? "border-blue-500 ring-4 ring-blue-500/20"
-                          : "border-transparent hover:border-gray-200"
+                          : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg"
                           }`}
                       >
-                        <div className={`h-48 bg-gradient-to-br from-${template.styles.primary}-500 to-${template.styles.primary}-600 p-6 relative`}>
+                        <div className="relative h-56 p-3 bg-gray-50 dark:bg-gray-900">
                           {selectedTemplate?.id === template.id && (
-                            <div className="absolute top-3 left-3 w-6 h-6 rounded-full bg-white flex items-center justify-center">
-                              <CheckCircle className="w-4 h-4 text-blue-600" />
+                            <div className="absolute top-2 left-2 z-10 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center shadow-md">
+                              <CheckCircle className="w-4 h-4 text-white" />
                             </div>
                           )}
-                          <div className="bg-white rounded-lg shadow-xl p-3 transform rotate-2 group-hover:rotate-0 transition-transform">
-                            <div className="h-3 w-16 bg-gray-800 rounded mb-2" />
-                            <div className="h-2 w-12 bg-gray-300 rounded mb-3" />
-                            <div className="space-y-1">
-                              <div className="h-1.5 w-full bg-gray-200 rounded" />
-                              <div className="h-1.5 w-5/6 bg-gray-200 rounded" />
-                            </div>
+                          <div className="h-full transform group-hover:scale-[1.02] transition-transform duration-200">
+                            <TemplateThumbnail 
+                              template={template} 
+                              className="h-full w-full rounded-lg"
+                            />
                           </div>
                         </div>
-                        <div className="p-4 bg-white dark:bg-gray-900">
-                          <h3 className="font-semibold text-gray-900 dark:text-white">{template.name}</h3>
+                        <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700">
+                          <h3 className="font-semibold text-gray-900 dark:text-white text-left">{template.name}</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-left truncate">
+                            {template.structure.layout.type === "two-column" ? "Two-column layout" : "Single-column layout"}
+                          </p>
                         </div>
                       </motion.button>
                     ))
