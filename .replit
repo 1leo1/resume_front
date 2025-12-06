@@ -51,6 +51,10 @@ externalPort = 3001
 NEXTAUTH_SECRET = "resume-ai-secret-key-for-development"
 NEXTAUTH_URL = "https://0.0.0.0:5000"
 
+[userenv.shared]
+NEXT_PUBLIC_SUPABASE_URL = "https://rigwegfcxsshiiorvday.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpZ3dlZ2ZjeHNzaGlpb3J2ZGF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ1MDY1MTIsImV4cCI6MjA4MDA4MjUxMn0.bt2ytr8Eq_VDzFwx2gCCKJi3DkPF5qFzFu16d5vfaZI"
+
 [deployment]
 deploymentTarget = "autoscale"
 run = ["npm", "run", "start"]
