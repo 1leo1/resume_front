@@ -12,16 +12,16 @@ TRUNCATE template_dummy_data;
 -- =====================================================
 INSERT INTO template_dummy_data (template_slug, industry, data)
 SELECT slug, 'tech', '{
-  "header": {
+  "basics": {
     "name": "Jordan Chen",
-    "title": "Senior Software Engineer",
+    "label": "Senior Software Engineer",
     "email": "jordan.chen@email.com",
     "phone": "(415) 555-0147",
-    "location": "San Francisco, CA",
-    "linkedin": "linkedin.com/in/jordanchen",
-    "website": "jordanchen.dev"
+    "location": {"city": "San Francisco", "region": "CA"},
+    "url": "jordanchen.dev",
+    "summary": "Full-stack software engineer with 8+ years of experience building scalable web applications and distributed systems. Expert in React, Node.js, Python, and cloud infrastructure. Led teams of 5-12 engineers, delivering products used by millions of users. Passionate about clean code, mentoring junior developers, and driving technical excellence.",
+    "profiles": [{"network": "LinkedIn", "url": "linkedin.com/in/jordanchen"}]
   },
-  "summary": "Full-stack software engineer with 8+ years of experience building scalable web applications and distributed systems. Expert in React, Node.js, Python, and cloud infrastructure. Led teams of 5-12 engineers, delivering products used by millions of users. Passionate about clean code, mentoring junior developers, and driving technical excellence.",
   "work": [
     {
       "company": "Stripe",
@@ -109,15 +109,15 @@ FROM templates;
 -- =====================================================
 INSERT INTO template_dummy_data (template_slug, industry, data)
 SELECT slug, 'business', '{
-  "header": {
+  "basics": {
     "name": "Alexandra Morrison",
-    "title": "Senior Financial Analyst",
+    "label": "Senior Financial Analyst",
     "email": "alexandra.morrison@email.com",
     "phone": "(212) 555-0198",
-    "location": "New York, NY",
-    "linkedin": "linkedin.com/in/alexandramorrison"
+    "location": {"city": "New York", "region": "NY"},
+    "summary": "Results-driven financial analyst with 7+ years of experience in investment banking, M&A transactions, and corporate finance. Expertise in financial modeling, valuation, and strategic planning. Successfully closed $2.5B+ in transactions. CFA Charterholder with strong analytical skills and proven track record of delivering actionable insights to C-suite executives.",
+    "profiles": [{"network": "LinkedIn", "url": "linkedin.com/in/alexandramorrison"}]
   },
-  "summary": "Results-driven financial analyst with 7+ years of experience in investment banking, M&A transactions, and corporate finance. Expertise in financial modeling, valuation, and strategic planning. Successfully closed $2.5B+ in transactions. CFA Charterholder with strong analytical skills and proven track record of delivering actionable insights to C-suite executives.",
   "work": [
     {
       "company": "Goldman Sachs",
@@ -192,15 +192,15 @@ FROM templates;
 -- =====================================================
 INSERT INTO template_dummy_data (template_slug, industry, data)
 SELECT slug, 'healthcare', '{
-  "header": {
+  "basics": {
     "name": "Dr. Sarah Mitchell",
-    "title": "Board-Certified Internal Medicine Physician",
+    "label": "Board-Certified Internal Medicine Physician",
     "email": "sarah.mitchell.md@email.com",
     "phone": "(617) 555-0234",
-    "location": "Boston, MA",
-    "linkedin": "linkedin.com/in/drsarahmitchell"
+    "location": {"city": "Boston", "region": "MA"},
+    "summary": "Board-certified internal medicine physician with 10+ years of clinical experience in hospital and outpatient settings. Expertise in chronic disease management, preventive care, and patient-centered medicine. Published researcher with 15+ peer-reviewed publications. Dedicated to improving patient outcomes through evidence-based practice and interdisciplinary collaboration.",
+    "profiles": [{"network": "LinkedIn", "url": "linkedin.com/in/drsarahmitchell"}]
   },
-  "summary": "Board-certified internal medicine physician with 10+ years of clinical experience in hospital and outpatient settings. Expertise in chronic disease management, preventive care, and patient-centered medicine. Published researcher with 15+ peer-reviewed publications. Dedicated to improving patient outcomes through evidence-based practice and interdisciplinary collaboration.",
   "work": [
     {
       "company": "Massachusetts General Hospital",
@@ -280,16 +280,16 @@ FROM templates;
 -- =====================================================
 INSERT INTO template_dummy_data (template_slug, industry, data)
 SELECT slug, 'creative', '{
-  "header": {
+  "basics": {
     "name": "Maya Rodriguez",
-    "title": "Senior Product Designer",
+    "label": "Senior Product Designer",
     "email": "maya@mayarodriguez.design",
     "phone": "(323) 555-0156",
-    "location": "Los Angeles, CA",
-    "linkedin": "linkedin.com/in/mayarodriguezdesign",
-    "website": "mayarodriguez.design"
+    "location": {"city": "Los Angeles", "region": "CA"},
+    "url": "mayarodriguez.design",
+    "summary": "Award-winning product designer with 8+ years crafting intuitive digital experiences for startups and Fortune 500 companies. Expert in design systems, user research, and prototyping. Led design for products reaching 50M+ users. Passionate about accessibility, inclusive design, and bridging the gap between user needs and business goals.",
+    "profiles": [{"network": "LinkedIn", "url": "linkedin.com/in/mayarodriguezdesign"}]
   },
-  "summary": "Award-winning product designer with 8+ years crafting intuitive digital experiences for startups and Fortune 500 companies. Expert in design systems, user research, and prototyping. Led design for products reaching 50M+ users. Passionate about accessibility, inclusive design, and bridging the gap between user needs and business goals.",
   "work": [
     {
       "company": "Spotify",
@@ -376,15 +376,15 @@ FROM templates;
 -- =====================================================
 INSERT INTO template_dummy_data (template_slug, industry, data)
 SELECT slug, 'marketing', '{
-  "header": {
+  "basics": {
     "name": "Marcus Johnson",
-    "title": "Director of Digital Marketing",
+    "label": "Director of Digital Marketing",
     "email": "marcus.johnson@email.com",
     "phone": "(312) 555-0189",
-    "location": "Chicago, IL",
-    "linkedin": "linkedin.com/in/marcusjohnsonmktg"
+    "location": {"city": "Chicago", "region": "IL"},
+    "summary": "Data-driven marketing leader with 10+ years of experience scaling B2B and D2C brands through integrated digital strategies. Expertise in growth marketing, demand generation, and brand building. Generated $150M+ in pipeline through marketing-led initiatives. Known for building high-performing teams and delivering measurable ROI.",
+    "profiles": [{"network": "LinkedIn", "url": "linkedin.com/in/marcusjohnsonmktg"}]
   },
-  "summary": "Data-driven marketing leader with 10+ years of experience scaling B2B and D2C brands through integrated digital strategies. Expertise in growth marketing, demand generation, and brand building. Generated $150M+ in pipeline through marketing-led initiatives. Known for building high-performing teams and delivering measurable ROI.",
   "work": [
     {
       "company": "HubSpot",
@@ -459,15 +459,15 @@ FROM templates;
 -- =====================================================
 INSERT INTO template_dummy_data (template_slug, industry, data)
 SELECT slug, 'education', '{
-  "header": {
+  "basics": {
     "name": "Dr. Emily Watson",
-    "title": "Associate Professor of Educational Psychology",
+    "label": "Associate Professor of Educational Psychology",
     "email": "emily.watson@university.edu",
     "phone": "(512) 555-0167",
-    "location": "Austin, TX",
-    "linkedin": "linkedin.com/in/dremilywatson"
+    "location": {"city": "Austin", "region": "TX"},
+    "summary": "Dedicated educator and researcher with 12+ years of experience in higher education. Expertise in educational psychology, curriculum development, and instructional design. Published 30+ peer-reviewed articles and secured $2M+ in research funding. Committed to fostering inclusive learning environments and preparing the next generation of educators.",
+    "profiles": [{"network": "LinkedIn", "url": "linkedin.com/in/dremilywatson"}]
   },
-  "summary": "Dedicated educator and researcher with 12+ years of experience in higher education. Expertise in educational psychology, curriculum development, and instructional design. Published 30+ peer-reviewed articles and secured $2M+ in research funding. Committed to fostering inclusive learning environments and preparing the next generation of educators.",
   "work": [
     {
       "company": "University of Texas at Austin",
@@ -553,15 +553,15 @@ FROM templates;
 -- =====================================================
 INSERT INTO template_dummy_data (template_slug, industry, data)
 SELECT slug, 'legal', '{
-  "header": {
+  "basics": {
     "name": "Jonathan Clarke",
-    "title": "Senior Associate Attorney",
+    "label": "Senior Associate Attorney",
     "email": "jclarke@lawfirm.com",
     "phone": "(202) 555-0142",
-    "location": "Washington, D.C.",
-    "linkedin": "linkedin.com/in/jonathanclarkeesq"
+    "location": {"city": "Washington", "region": "D.C."},
+    "summary": "Accomplished corporate attorney with 8+ years of experience in mergers and acquisitions, securities regulation, and corporate governance. Closed $5B+ in complex transactions for Fortune 500 clients. Known for strategic thinking, meticulous attention to detail, and ability to navigate complex regulatory environments. Admitted to practice in DC, NY, and before the SEC.",
+    "profiles": [{"network": "LinkedIn", "url": "linkedin.com/in/jonathanclarkeesq"}]
   },
-  "summary": "Accomplished corporate attorney with 8+ years of experience in mergers and acquisitions, securities regulation, and corporate governance. Closed $5B+ in complex transactions for Fortune 500 clients. Known for strategic thinking, meticulous attention to detail, and ability to navigate complex regulatory environments. Admitted to practice in DC, NY, and before the SEC.",
   "work": [
     {
       "company": "Sullivan & Cromwell LLP",
@@ -640,15 +640,15 @@ FROM templates;
 -- =====================================================
 INSERT INTO template_dummy_data (template_slug, industry, data)
 SELECT slug, 'other', '{
-  "header": {
+  "basics": {
     "name": "Taylor Anderson",
-    "title": "Program Manager",
+    "label": "Program Manager",
     "email": "taylor.anderson@email.com",
     "phone": "(555) 555-0123",
-    "location": "Denver, CO",
-    "linkedin": "linkedin.com/in/tayloranderson"
+    "location": {"city": "Denver", "region": "CO"},
+    "summary": "Versatile professional with 7+ years of experience in project and program management across multiple industries. Proven track record of delivering complex initiatives on time and under budget. Strong leadership, communication, and problem-solving skills. Passionate about driving organizational efficiency and team development.",
+    "profiles": [{"network": "LinkedIn", "url": "linkedin.com/in/tayloranderson"}]
   },
-  "summary": "Versatile professional with 7+ years of experience in project and program management across multiple industries. Proven track record of delivering complex initiatives on time and under budget. Strong leadership, communication, and problem-solving skills. Passionate about driving organizational efficiency and team development.",
   "work": [
     {
       "company": "Accenture",
