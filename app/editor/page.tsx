@@ -194,7 +194,12 @@ function EditorContent() {
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
-        const res = await fetch("/api/templates/");
+        const industryParam = searchParams.get("industry");
+        const url = industryParam
+          ? `/api/templates/?industry=${encodeURIComponent(industryParam)}`
+          : "/api/templates/";
+
+        const res = await fetch(url);
         if (res.ok) {
           const data = await res.json();
           if (data && data.length > 0) {
