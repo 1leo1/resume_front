@@ -34,8 +34,8 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 41749
-externalPort = 3002
+localPort = 38945
+externalPort = 3003
 
 [[ports]]
 localPort = 42325
@@ -54,6 +54,7 @@ NEXTAUTH_URL = "https://0.0.0.0:5000"
 [userenv.shared]
 NEXT_PUBLIC_SUPABASE_URL = "https://rigwegfcxsshiiorvday.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpZ3dlZ2ZjeHNzaGlpb3J2ZGF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ1MDY1MTIsImV4cCI6MjA4MDA4MjUxMn0.bt2ytr8Eq_VDzFwx2gCCKJi3DkPF5qFzFu16d5vfaZI"
+NEXT_PUBLIC_API_URL = "https://1leo1-resume.vercel.app"
 
 [deployment]
 deploymentTarget = "autoscale"
